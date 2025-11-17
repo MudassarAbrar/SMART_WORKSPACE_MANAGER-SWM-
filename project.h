@@ -67,8 +67,8 @@ void calculateBonus(int emp_id);
 // 6) Display full details for one employee by ID
 void displayEmployee(int emp_id);
 
-// 7) Add a new department by name
-void addDepartment(char deptName[]);
+// 7) Add a new department by name and capacity
+void addDepartment(char deptName[], int capacity);
 
 // 8) Remove a department by name
 void removeDepartment(char deptName[]);
@@ -81,6 +81,9 @@ void displayDepartment(char deptName[]);
 
 // 11) Get average performance of a given department
 double getDeptAvgPerformance(char deptName[]);
+
+// 12) Display department capacity information
+void displayDeptCapacity(char deptName[]);
 
 // 12) Add a new meeting (take topic/date/time as input inside)
 void addMeeting();
@@ -108,9 +111,9 @@ void freeMemory();
 
 // FILE HANDLING PROTOTYPES
 
-// Employees -> BINARY file
-void loadEmployeesFromBinary(const char* filename);
-void saveEmployeesToBinary(const char* filename);
+// Employees -> TEXT file
+void loadEmployeesFromText(const char* filename);
+void saveEmployeesToText(const char* filename);
 
 // Departments -> TEXT file
 void loadDepartmentsFromText(const char* filename);

@@ -207,8 +207,8 @@ void markAttendance(int emp_id)
     if (idx == -1)
     {
         cout << "Employee not found.\n";
-        return;
-    }
+            return;
+        }
 
     int newAttendance;
     cout << "Enter new attendance (0 - 365): ";
@@ -232,8 +232,8 @@ void updatePerformance(int emp_id, double score)
     if (idx == -1)
     {
         cout << "Employee not found.\n";
-        return;
-    }
+            return;
+        }
     if (score < 0 || score > 100)
     {
         cout << "Score must be between 0 and 100.\n";
@@ -250,8 +250,8 @@ void calculateBonus(int emp_id)
     if (idx == -1)
     {
         cout << "Employee not found.\n";
-        return;
-    }
+            return;
+        }
 
     if (employees_list[idx].performance > 90 && employees_list[idx].attendance > 85)
         employees_list[idx].bonus_eligible = 1;
@@ -281,45 +281,181 @@ void displayEmployee(int emp_id)
 }
 
 // ---------------------------------------------------------------------------
-// File Handling – Employees (binary)
+// File Handling – Employees (text format)
+// Format per line: emp_id|emp_name|dept_name|salary|attendance|performance|bonus_eligible
 // ---------------------------------------------------------------------------
-void loadEmployeesFromBinary(const char* filename)
+static void parseEmployeeLine(const char* line, Employee& emp)
 {
-    ifstream fin(filename, ios::binary);
-    employee_count = 0;
-    if (!fin)
-        return;
+    int i = 0;
+    int field = 0;
+    char buffer[200];
+    int bufIdx = 0;
 
-    int stored_count = 0;
-    fin.read(reinterpret_cast<char*>(&stored_count), sizeof(int));
-    if (!fin)
-        return;
-
-    if (stored_count < 0)
-        stored_count = 0;
-    if (stored_count > MAX_EMPLOYEES)
-        stored_count = MAX_EMPLOYEES;
-
-    fin.read(reinterpret_cast<char*>(employees_list), stored_count * sizeof(Employee));
-    if (!fin)
+    while (line[i] != '\0' && field < 7)
     {
-        employee_count = 0;
-        return;
-    }
+        if (line[i] == '|')
+        {
+            buffer[bufIdx] = '\0';
+            bufIdx = 0;
 
-    employee_count = stored_count;
+            switch (field)
+            {
+            case 0: // emp_id
+            {
+                int val = 0;
+                int j = 0;
+                while (buffer[j] != '\0')
+                {
+                    if (buffer[j] >= '0' && buffer[j] <= '9')
+                        val = val * 10 + (buffer[j] - '0');
+                    j++;
+                }
+                emp.emp_id = val;
+                break;
+            }
+            case 1: // emp_name
+                copyString(emp.emp_name, buffer, 50);
+                break;
+            case 2: // dept_name
+                copyString(emp.dept_name, buffer, 30);
+                break;
+            case 3: // salary
+            {
+                double val = 0.0;
+                int j = 0;
+                bool neg = false;
+                if (buffer[0] == '-')
+                {
+                    neg = true;
+                    j = 1;
+                }
+                bool afterDot = false;
+                double divisor = 1.0;
+                while (buffer[j] != '\0')
+                {
+                    if (buffer[j] == '.')
+                    {
+                        afterDot = true;
+                    }
+                    else if (buffer[j] >= '0' && buffer[j] <= '9')
+                    {
+                        if (afterDot)
+                        {
+                            divisor *= 10.0;
+                            val = val + (buffer[j] - '0') / divisor;
+                        }
+                        else
+                        {
+                            val = val * 10.0 + (buffer[j] - '0');
+                        }
+                    }
+                    j++;
+                }
+                emp.salary = neg ? -val : val;
+                break;
+            }
+            case 4: // attendance
+            {
+                int val = 0;
+                int j = 0;
+                while (buffer[j] != '\0')
+                {
+                    if (buffer[j] >= '0' && buffer[j] <= '9')
+                        val = val * 10 + (buffer[j] - '0');
+                    j++;
+                }
+                emp.attendance = val;
+                break;
+            }
+            case 5: // performance
+            {
+                double val = 0.0;
+                int j = 0;
+                bool neg = false;
+                if (buffer[0] == '-')
+                {
+                    neg = true;
+                    j = 1;
+                }
+                bool afterDot = false;
+                double divisor = 1.0;
+                while (buffer[j] != '\0')
+                {
+                    if (buffer[j] == '.')
+                    {
+                        afterDot = true;
+                    }
+                    else if (buffer[j] >= '0' && buffer[j] <= '9')
+                    {
+                        if (afterDot)
+                        {
+                            divisor *= 10.0;
+                            val = val + (buffer[j] - '0') / divisor;
+                        }
+                        else
+                        {
+                            val = val * 10.0 + (buffer[j] - '0');
+                        }
+                    }
+                    j++;
+                }
+                emp.performance = neg ? -val : val;
+                break;
+            }
+            case 6: // bonus_eligible
+            {
+                int val = 0;
+                if (buffer[0] == '1')
+                    val = 1;
+                emp.bonus_eligible = val;
+                break;
+            }
+            }
+            field++;
+        }
+        else
+        {
+            if (bufIdx < 199)
+                buffer[bufIdx++] = line[i];
+        }
+        i++;
+    }
 }
 
-void saveEmployeesToBinary(const char* filename)
+void loadEmployeesFromText(const char* filename)
 {
-    ofstream fout(filename, ios::binary);
+    ifstream fin(filename);
+    employee_count = 0;
+
+    if (!fin)
+        return;
+
+    char line[500];
+    while (employee_count < MAX_EMPLOYEES && fin.getline(line, 500))
+    {
+        if (line[0] == '\0')
+            continue;
+
+        Employee& emp = employees_list[employee_count];
+        parseEmployeeLine(line, emp);
+        employee_count++;
+    }
+}
+
+void saveEmployeesToText(const char* filename)
+{
+    ofstream fout(filename);
     if (!fout)
     {
         cout << "Unable to open employee file for writing.\n";
         return;
     }
 
-    fout.write(reinterpret_cast<const char*>(&employee_count), sizeof(int));
-    if (employee_count > 0)
-        fout.write(reinterpret_cast<const char*>(employees_list), employee_count * sizeof(Employee));
+    for (int i = 0; i < employee_count; i++)
+    {
+        Employee& emp = employees_list[i];
+        fout << emp.emp_id << '|' << emp.emp_name << '|' << emp.dept_name << '|'
+             << emp.salary << '|' << emp.attendance << '|' << emp.performance << '|'
+             << emp.bonus_eligible << '\n';
+    }
 }

@@ -27,7 +27,7 @@ int main()
 {
     initializeMemory();
 
-    loadEmployeesFromBinary("employee.txt");
+    loadEmployeesFromText("employee.txt");
     loadDepartmentsFromText("departments.txt");
     loadMeetingsFromText("meetings.txt");
 
@@ -73,7 +73,7 @@ int main()
         cout << '\n';
     }
 
-    saveEmployeesToBinary("employee.txt");
+    saveEmployeesToText("employee.txt");
     saveDepartmentsToText("departments.txt");
     saveMeetingsToText("meetings.txt");
 
@@ -192,6 +192,7 @@ void handleDepartmentManagement()
         cout << " 3. Display Department\n";
         cout << " 4. Find Top Performer\n";
         cout << " 5. Department Average Performance\n";
+        cout << " 6. Check Department Capacity\n";
         cout << " 0. Back\n";
         cout << "Select option: ";
 
@@ -212,10 +213,16 @@ void handleDepartmentManagement()
         switch (choice)
         {
         case 1:
+        {
             cout << "Enter Department Name: ";
             cin.getline(deptName, 30);
-            addDepartment(deptName);
+            int capacity = readInt("Enter Maximum Capacity: ");
+            if (capacity > 0)
+                addDepartment(deptName, capacity);
+            else
+                cout << "Invalid capacity.\n";
             break;
+        }
         case 2:
             cout << "Enter Department Name to remove: ";
             cin.getline(deptName, 30);
@@ -241,6 +248,11 @@ void handleDepartmentManagement()
             cout << "Enter Department Name to get average performance: ";
             cin.getline(deptName, 30);
             cout << "Average performance: " << getDeptAvgPerformance(deptName) << '\n';
+            break;
+        case 6:
+            cout << "Enter Department Name to check capacity: ";
+            cin.getline(deptName, 30);
+            displayDeptCapacity(deptName);
             break;
         case 0:
             back = true;
