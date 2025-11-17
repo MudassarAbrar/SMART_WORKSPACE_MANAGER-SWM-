@@ -4,68 +4,68 @@
 
 struct Employee
 {
-    int   id;
-    char  name[50];
-    char  department[30];
+    int   emp_id;
+    char  emp_name[50];
+    char  dept_name[30];
     double salary;
-    int   attendance;    
-    double performance;   
-    int   bonusEligible; 
+    int   attendance;
+    double performance;
+    int   bonus_eligible;
 };
 
 struct Department
 {
-    char name[30];
-    int  employeeCount;    
-    int  employeeCapacity; 
-    int* employeeIds;      
+    char  dept_name[30];
+    int   emp_count;
+    int   emp_capacity;
+    int*  emp_ids;
 };
 
 struct Meeting
 {
-    int   id;
-    char  topic[50];
-    char  date[11];   // "YYYY-MM-DD"
-    char  time[6];    // "HH:MM"
-    int   participantCount;    
-    int   participantCapacity; 
-    int*  participantIds;     
+    int   meet_id;
+    char  meet_topic[50];
+    char  meet_date[11];   // "YYYY-MM-DD"
+    char  meet_time[6];    // "HH:MM"
+    int   participant_count;
+    int   participant_capacity;
+    int*  participant_ids;
 };
 
 // GLOBALS (DECLARATIONS ONLY)
 
- extern const int MAX_EMPLOYEES;
- extern const int MAX_DEPARTMENTS;
+extern const int MAX_EMPLOYEES;
+extern const int MAX_DEPARTMENTS;
 extern const int MAX_MEETINGS;
 
- extern Employee*   employees;
- extern int         employeeCount;
+extern Employee*   employees_list;
+extern int         employee_count;
 
- extern Department* departments;
- extern int         departmentCount;
+extern Department* departments_list;
+extern int         department_count;
 
- extern Meeting*   meetings;
- extern int     meetingCount;
+extern Meeting*    meetings_list;
+extern int         meeting_count;
 
 
 // 1) Add a new employee (take input inside the function)
 void addEmployee();
 
 // 2) Remove an employee by ID
-void removeEmployee(int id);
+void removeEmployee(int emp_id);
 
 // 3) Mark / update attendance for a specific employee ID
-void markAttendance(int id);
+void markAttendance(int emp_id);
 
 // 4) Update performance score for a specific employee ID
-void updatePerformance(int id, double score);
+void updatePerformance(int emp_id, double score);
 
 // 5) Calculate bonus eligibility for a specific employee ID
 //    (e.g. performance > 90 and attendance > 85)
-void calculateBonus(int id);
+void calculateBonus(int emp_id);
 
 // 6) Display full details for one employee by ID
-void displayEmployee(int id);
+void displayEmployee(int emp_id);
 
 // 7) Add a new department by name
 void addDepartment(char deptName[]);
@@ -85,10 +85,8 @@ double getDeptAvgPerformance(char deptName[]);
 // 12) Add a new meeting (take topic/date/time as input inside)
 void addMeeting();
 
-// 13) Schedule a meeting (check clashes before confirming).
-//     meetingIndex is the index in meetings[] you want to schedule.
-//     Return 1 if scheduled successfully, 0 if there is a time clash.
-int scheduleMeeting(int meetingIndex);
+// 13) Schedule a meeting (take info, ensure no time clash). Returns 1 on success.
+int scheduleMeeting();
 
 // 14) Display details of a meeting at a given index
 void displayMeeting(int index);

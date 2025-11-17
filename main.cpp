@@ -1,232 +1,324 @@
 #include "project.h"
 #include <iostream>
+
 using namespace std;
 
-// Only used in this file
 void showMainMenu();
+void handleEmployeeManagement();
+void handleDepartmentManagement();
+void handleMeetingManagement();
+
+static int readInt(const char* prompt)
+{
+    int value;
+    cout << prompt;
+    cin >> value;
+    if (cin.fail())
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        return -1;
+    }
+    cin.ignore(1000, '\n');
+    return value;
+}
 
 int main()
 {
-    int choice;
-
-    // 1) Allocate dynamic memory
     initializeMemory();
 
-    // 2) Load data from files
-    //    Employees from binary, departments & meetings from text
-    loadEmployeesFromBinary("employees.bin");
+    loadEmployeesFromBinary("employee.txt");
     loadDepartmentsFromText("departments.txt");
     loadMeetingsFromText("meetings.txt");
 
     cout << "============================================\n";
-    cout << "      SMART WORKSPACE MANAGER (STRUCTURED)\n";
+    cout << "      SMART WORKSPACE MANAGER \n";
     cout << "============================================\n";
 
-    // Main loop
-    do
+    bool running = true;
+    while (running)
     {
         showMainMenu();
         cout << "Enter your choice: ";
+        int choice;
         cin >> choice;
-        cin.ignore(1000, '\n'); // clear buffer
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input. Try again.\n";
+            continue;
+        }
+        cin.ignore(1000, '\n');
 
-        if (choice == 1)
+        switch (choice)
         {
-            addEmployee();
-        }
-        else if (choice == 2)
-        {
-            int id;
-            cout << "Enter Employee ID to remove: ";
-            cin >> id;
-            cin.ignore(1000, '\n');
-            removeEmployee(id);
-        }
-        else if (choice == 3)
-        {
-            int id;
-            cout << "Enter Employee ID to mark attendance: ";
-            cin >> id;
-            cin.ignore(1000, '\n');
-            markAttendance(id);
-        }
-        else if (choice == 4)
-        {
-            int id;
-            double score;
-            cout << "Enter Employee ID to update performance: ";
-            cin >> id;
-            cout << "Enter new performance score (0 - 100): ";
-            cin >> score;
-            cin.ignore(1000, '\n');
-            updatePerformance(id, score);
-        }
-        else if (choice == 5)
-        {
-            int id;
-            cout << "Enter Employee ID to calculate bonus: ";
-            cin >> id;
-            cin.ignore(1000, '\n');
-            calculateBonus(id);
-        }
-        else if (choice == 6)
-        {
-            int id;
-            cout << "Enter Employee ID to display: ";
-            cin >> id;
-            cin.ignore(1000, '\n');
-            displayEmployee(id);
-        }
-        else if (choice == 7)
-        {
-            char deptName[30];
-            cout << "Enter Department Name: ";
-            cin.getline(deptName, 30);
-            addDepartment(deptName);
-        }
-        else if (choice == 8)
-        {
-            char deptName[30];
-            cout << "Enter Department Name to remove: ";
-            cin.getline(deptName, 30);
-            removeDepartment(deptName);
-        }
-        else if (choice == 9)
-        {
-            char deptName[30];
-            cout << "Enter Department Name to display: ";
-            cin.getline(deptName, 30);
-            displayDepartment(deptName);
-        }
-        else if (choice == 10)
-        {
-            char deptName[30];
-            cout << "Enter Department Name to find top performer: ";
-            cin.getline(deptName, 30);
-            int topId = findTopPerformer(deptName);
-            if (topId == -1)
-            {
-                cout << "No employees found in this department or department not found.\n";
-            }
-            else
-            {
-                cout << "Top performer in department " << deptName
-                     << " is Employee ID: " << topId << endl;
-            }
-        }
-        else if (choice == 11)
-        {
-            char deptName[30];
-            cout << "Enter Department Name to get average performance: ";
-            cin.getline(deptName, 30);
-            double avg = getDeptAvgPerformance(deptName);
-            cout << "Average performance of department " << deptName
-                 << " is: " << avg << endl;
-        }
-        else if (choice == 12)
-        {
-            addMeeting();
-        }
-        else if (choice == 13)
-        {
-            int meetIndex;
-            cout << "Enter meeting index to schedule (0 to " << (meetingCount - 1) << "): ";
-            cin >> meetIndex;
-            cin.ignore(1000, '\n');
-            int ok = scheduleMeeting(meetIndex);
-            if (ok == 1)
-            {
-                cout << "Meeting scheduled successfully (no time clash).\n";
-            }
-            else
-            {
-                cout << "Meeting clash detected. Could not schedule.\n";
-            }
-        }
-        else if (choice == 14)
-        {
-            int meetIdx, empId;
-            cout << "Enter meeting index: ";
-            cin >> meetIdx;
-            cout << "Enter employee ID to add as participant: ";
-            cin >> empId;
-            cin.ignore(1000, '\n');
-            addParticipant(meetIdx, empId);
-        }
-        else if (choice == 15)
-        {
-            int index;
-            cout << "Enter meeting index to display: ";
-            cin >> index;
-            cin.ignore(1000, '\n');
-            displayMeeting(index);
-        }
-        else if (choice == 16)
-        {
-            int a, b;
-            cout << "Enter first meeting index: ";
-            cin >> a;
-            cout << "Enter second meeting index: ";
-            cin >> b;
-            cin.ignore(1000, '\n');
-            int clash = hasTimeClash(a, b);
-            if (clash == 1)
-            {
-                cout << "The two meetings have a time clash.\n";
-            }
-            else
-            {
-                cout << "No time clash between the two meetings.\n";
-            }
-        }
-        else if (choice == 0)
-        {
+        case 1:
+            handleEmployeeManagement();
+            break;
+        case 2:
+            handleDepartmentManagement();
+            break;
+        case 3:
+            handleMeetingManagement();
+            break;
+        case 4:
+            running = false;
             cout << "Exiting program...\n";
+            break;
+        default:
+            cout << "Invalid option. Try again.\n";
+            break;
         }
-        else
-        {
-            cout << "Invalid choice. Please try again.\n";
-        }
+        cout << '\n';
+    }
 
-        cout << endl;
-
-    } while (choice != 0);
-
-    saveEmployeesToBinary("employees.bin");
+    saveEmployeesToBinary("employee.txt");
     saveDepartmentsToText("departments.txt");
     saveMeetingsToText("meetings.txt");
 
     freeMemory();
-
     return 0;
 }
 
 void showMainMenu()
 {
     cout << "--------------------------------------------\n";
-    cout << "                 MAIN MENU                  \n";
+    cout << "                MAIN MENU                   \n";
     cout << "--------------------------------------------\n";
-    cout << " 1. Add Employee\n";
-    cout << " 2. Remove Employee\n";
-    cout << " 3. Mark Attendance\n";
-    cout << " 4. Update Performance\n";
-    cout << " 5. Calculate Bonus for Employee\n";
-    cout << " 6. Display Employee\n";
-    cout << " 7. Add Department\n";
-    cout << " 8. Remove Department\n";
-    cout << " 9. Display Department\n";
-    cout << "10. Find Top Performer in Department\n";
-    cout << "11. Get Department Average Performance\n";
-    cout << "12. Add Meeting\n";
-    cout << "13. Schedule Meeting (check for clash)\n";
-    cout << "14. Add Participant to Meeting\n";
-    cout << "15. Display Meeting\n";
-    cout << "16. Check Time Clash Between Two Meetings\n";
-    cout << " 0. Exit\n";
+    cout << " 1. Employee Management\n";
+    cout << " 2. Department Management\n";
+    cout << " 3. Meeting Management\n";
+    cout << " 4. Exit\n";
     cout << "--------------------------------------------\n";
 }
-// 1st Change  :  MAKE 4 OPTIONS 1-EMP 2-DEP 3-MARKS 4-EXIT
-// 2nd change  : file handling in department in last two functions
-// 3rd change  : emp me sari text file handling krni h
-// optional change 4  : graph for emp and department
-// 5th change  : check for meetings and rest
+
+void handleEmployeeManagement()
+{
+    bool back = false;
+    while (!back)
+    {
+        cout << "\n--- Employee Management ---\n";
+        cout << " 1. Add Employee\n";
+        cout << " 2. Remove Employee\n";
+        cout << " 3. Mark Attendance\n";
+        cout << " 4. Update Performance\n";
+        cout << " 5. Calculate Bonus\n";
+        cout << " 6. Display Employee\n";
+        cout << " 0. Back\n";
+        cout << "Select option: ";
+
+        int choice;
+        cin >> choice;
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input.\n";
+            continue;
+        }
+        cin.ignore(1000, '\n');
+
+        switch (choice)
+        {
+        case 1:
+            addEmployee();
+            break;
+        case 2:
+        {
+            int empId = readInt("Enter Employee ID to remove: ");
+            if (empId != -1)
+                removeEmployee(empId);
+            break;
+        }
+        case 3:
+        {
+            int empId = readInt("Enter Employee ID to mark attendance: ");
+            if (empId != -1)
+                markAttendance(empId);
+            break;
+        }
+        case 4:
+        {
+            int empId = readInt("Enter Employee ID to update performance: ");
+            if (empId == -1)
+                break;
+            double score;
+            cout << "Enter new performance score (0 - 100): ";
+            cin >> score;
+            if (cin.fail())
+            {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Invalid score.\n";
+                break;
+            }
+            cin.ignore(1000, '\n');
+            updatePerformance(empId, score);
+            break;
+        }
+        case 5:
+        {
+            int empId = readInt("Enter Employee ID to calculate bonus: ");
+            if (empId != -1)
+                calculateBonus(empId);
+            break;
+        }
+        case 6:
+        {
+            int empId = readInt("Enter Employee ID to display: ");
+            if (empId != -1)
+                displayEmployee(empId);
+            break;
+        }
+        case 0:
+            back = true;
+            break;
+        default:
+            cout << "Invalid option.\n";
+            break;
+        }
+    }
+}
+
+void handleDepartmentManagement()
+{
+    bool back = false;
+    while (!back)
+    {
+        cout << "\n--- Department Management ---\n";
+        cout << " 1. Add Department\n";
+        cout << " 2. Remove Department\n";
+        cout << " 3. Display Department\n";
+        cout << " 4. Find Top Performer\n";
+        cout << " 5. Department Average Performance\n";
+        cout << " 0. Back\n";
+        cout << "Select option: ";
+
+        int choice;
+        cin >> choice;
+        if (cin.fail())//cin.fail() checks whether the previous formatted read hit an error (bad input, etc.).
+        {
+            cin.clear();
+            //cin.clear() resets the stream’s error flags so you can keep using it after a failure.
+            cin.ignore(1000, '\n');
+            //cin.ignore(n, '\n') discards up to n characters or until it reaches the delimiter ('\n' here), letting us skip the leftover garbage in the input buffer before the next read.
+            cout << "Invalid input.\n";
+            continue;
+        }
+        cin.ignore(1000, '\n');
+
+        char deptName[30];
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter Department Name: ";
+            cin.getline(deptName, 30);
+            addDepartment(deptName);
+            break;
+        case 2:
+            cout << "Enter Department Name to remove: ";
+            cin.getline(deptName, 30);
+            removeDepartment(deptName);
+            break;
+        case 3:
+            cout << "Enter Department Name to display: ";
+            cin.getline(deptName, 30);
+            displayDepartment(deptName);
+            break;
+        case 4:
+        {
+            cout << "Enter Department Name to find top performer: ";
+            cin.getline(deptName, 30);
+            int topId = findTopPerformer(deptName);
+            if (topId == -1)
+                cout << "No employees found or department missing.\n";
+            else
+                cout << "Top performer ID: " << topId << '\n';
+            break;
+        }
+        case 5:
+            cout << "Enter Department Name to get average performance: ";
+            cin.getline(deptName, 30);
+            cout << "Average performance: " << getDeptAvgPerformance(deptName) << '\n';
+            break;
+        case 0:
+            back = true;
+            break;
+        default:
+            cout << "Invalid option.\n";
+            break;
+        }
+    }
+}
+
+void handleMeetingManagement()
+{
+    bool back = false;
+    while (!back)
+    {
+        cout << "\n--- Meeting Management ---\n";
+        cout << " 1. Add Meeting\n";
+        cout << " 2. Schedule Meeting (check clash)\n";
+        cout << " 3. Add Participant\n";
+        cout << " 4. Display Meeting\n";
+        cout << " 5. Check Time Clash Between Two Meetings\n";
+        cout << " 0. Back\n";
+        cout << "Select option: ";
+
+        int choice;
+        cin >> choice;
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input.\n";
+            continue;
+        }
+        cin.ignore(1000, '\n');
+
+        switch (choice)
+        {
+        case 1:
+            addMeeting();
+            break;
+        case 2:
+            scheduleMeeting();
+            break;
+        case 3:
+        {
+            int meetIdx = readInt("Enter meeting index: ");
+            int empId = readInt("Enter employee ID to add as participant: ");
+            if (meetIdx >= 0 && empId >= 0)
+                addParticipant(meetIdx, empId);
+            break;
+        }
+        case 4:
+        {
+            int index = readInt("Enter meeting index to display: ");
+            if (index >= 0)
+                displayMeeting(index);
+            break;
+        }
+        case 5:
+        {
+            int first = readInt("Enter first meeting index: ");
+            int second = readInt("Enter second meeting index: ");
+            if (first >= 0 && second >= 0)
+            {
+                if (hasTimeClash(first, second))
+                    cout << "Meetings clash.\n";
+                else
+                    cout << "No clash detected.\n";
+            }
+            break;
+        }
+        case 0:
+            back = true;
+            break;
+        default:
+            cout << "Invalid option.\n";
+            break;
+        }
+    }
+}

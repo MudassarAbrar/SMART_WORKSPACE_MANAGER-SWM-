@@ -11,46 +11,46 @@ const int MAX_MEETINGS    = 50;
 
 // Employee data for the whole program 
 //sir ne dynamic must kaha tha is lye kia h yeh to dono is wja se confuse na hona
-Employee* employees      = nullptr;
-int       employeeCount  = 0;    // yeh bata rha h k how many employees are currently stored
+Employee* employees_list      = nullptr;
+int       employee_count      = 0;
 
 // Department data for the whole program 
-Department* departments   = nullptr;
-int         departmentCount = 0;  // yeh bata rha h k how many depart are currently stored
+Department* departments_list  = nullptr;
+int         department_count  = 0;
 
 
 // Meeting data for the whole program 
-Meeting* meetings        = nullptr;
-int      meetingCount    = 0;     // yeh bata rha h k how many meetings are currently stored
+Meeting* meetings_list        = nullptr;
+int      meeting_count        = 0;
 
-    void initializeMemory()
+void initializeMemory()
 {
     // Allocate the main dynamic arrays
-    employees   = new Employee[MAX_EMPLOYEES];
-    departments = new Department[MAX_DEPARTMENTS];
-    meetings    = new Meeting[MAX_MEETINGS];
-    employeeCount   = 0;
-    departmentCount = 0;
-    meetingCount    = 0;
+    employees_list   = new Employee[MAX_EMPLOYEES];
+    departments_list = new Department[MAX_DEPARTMENTS];
+    meetings_list    = new Meeting[MAX_MEETINGS];
+    employee_count   = 0;
+    department_count = 0;
+    meeting_count    = 0;
 
     // Initialize department pointers
     for (int i = 0; i < MAX_DEPARTMENTS; i++)
     {
-        departments[i].employeeIds      = nullptr;
-        departments[i].employeeCount    = 0;
-        departments[i].employeeCapacity = 0;
-        departments[i].name[0] = '\0';
+        departments_list[i].emp_ids      = nullptr;
+        departments_list[i].emp_count    = 0;
+        departments_list[i].emp_capacity = 0;
+        departments_list[i].dept_name[0] = '\0';
     }
 
     // Initialize meeting inner pointers
     for (int i = 0; i < MAX_MEETINGS; i++)
     {
-        meetings[i].participantIds      = nullptr;
-        meetings[i].participantCount    = 0;
-        meetings[i].participantCapacity = 0;
-        meetings[i].topic[0] = '\0';
-        meetings[i].date[0]  = '\0';
-        meetings[i].time[0]  = '\0';
+        meetings_list[i].participant_ids      = nullptr;
+        meetings_list[i].participant_count    = 0;
+        meetings_list[i].participant_capacity = 0;
+        meetings_list[i].meet_topic[0] = '\0';
+        meetings_list[i].meet_date[0]  = '\0';
+        meetings_list[i].meet_time[0]  = '\0';
     }
 }
 
@@ -59,51 +59,51 @@ int      meetingCount    = 0;     // yeh bata rha h k how many meetings are curr
 void freeMemory()
 {
     // Free inner arrays for departments
-    for (int i = 0; i < departmentCount; i++)
+    for (int i = 0; i < department_count; i++)
     {
-        if (departments[i].employeeIds != nullptr)
+        if (departments_list[i].emp_ids != nullptr)
         {
-            delete[] departments[i].employeeIds;
-            departments[i].employeeIds = nullptr;
-            departments[i].employeeCount = 0;
-            departments[i].employeeCapacity = 0;
+            delete[] departments_list[i].emp_ids;
+            departments_list[i].emp_ids = nullptr;
+            departments_list[i].emp_count = 0;
+            departments_list[i].emp_capacity = 0;
         }
     }
 
     // Free inner arrays for meetings
-    for (int i = 0; i < meetingCount; i++)
+    for (int i = 0; i < meeting_count; i++)
     {
-        if (meetings[i].participantIds != nullptr)
+        if (meetings_list[i].participant_ids != nullptr)
         {
-            delete[] meetings[i].participantIds;
-            meetings[i].participantIds = nullptr;
-            meetings[i].participantCount = 0;
-            meetings[i].participantCapacity = 0;
+            delete[] meetings_list[i].participant_ids;
+            meetings_list[i].participant_ids = nullptr;
+            meetings_list[i].participant_count = 0;
+            meetings_list[i].participant_capacity = 0;
         }
     }
 
     // Free main arrays
-    if (employees != nullptr)
+    if (employees_list != nullptr)
     {
-        delete[] employees;
-        employees = nullptr;
+        delete[] employees_list;
+        employees_list = nullptr;
     }
 
-    if (departments != nullptr)
+    if (departments_list != nullptr)
     {
-        delete[] departments;
-        departments = nullptr;
+        delete[] departments_list;
+        departments_list = nullptr;
     }
 
-    if (meetings != nullptr)
+    if (meetings_list != nullptr)
     {
-        delete[] meetings;
-        meetings = nullptr;
+        delete[] meetings_list;
+        meetings_list = nullptr;
     }
 
     // Reset counts
-    employeeCount   = 0;
-    departmentCount = 0;
-    meetingCount    = 0;
+    employee_count   = 0;
+    department_count = 0;
+    meeting_count    = 0;
 }
 

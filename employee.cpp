@@ -1,158 +1,325 @@
 #include "project.h"
 #include <iostream>
 #include <fstream>
+
 using namespace std;
 
-// 1) Add a new employee (take input inside the function)
+static void copyString(char* destination, const char* source, int destinationSize)
+{
+    if (destinationSize <= 0)
+        return;
+    int i = 0;
+    while (i < destinationSize - 1 && source[i] != '\0')
+    {
+        destination[i] = source[i];
+        i++;
+    }
+    destination[i] = '\0';
+}
+
+static bool stringsEqual(const char* a, const char* b)
+{
+    int idx = 0;
+    while (a[idx] != '\0' || b[idx] != '\0')
+    {
+        if (a[idx] != b[idx])
+            return false;
+        idx++;
+    }
+    return true;
+}
+
+static bool stringEmpty(const char* text)
+{
+    return text[0] == '\0';
+}
+
+// ---------------------------------------------------------------------------
+// Lookups & validations
+// ---------------------------------------------------------------------------
+static int findEmployeeIndex(int emp_id)
+{
+    for (int i = 0; i < employee_count; i++)
+    {
+        if (employees_list[i].emp_id == emp_id)
+            return i;
+    }
+    return -1;
+}
+
+static int findDepartmentIndex(const char* dept_name)
+{
+    for (int i = 0; i < department_count; i++)
+    {
+        if (stringsEqual(departments_list[i].dept_name, dept_name))
+            return i;
+    }
+    return -1;
+}
+
+static void ensureDepartmentCapacity(int dept_index, int minCapacity)
+{
+    if (dept_index < 0 || dept_index >= department_count)
+        return;
+
+    if (departments_list[dept_index].emp_capacity >= minCapacity)
+        return;
+
+    int newCapacity = departments_list[dept_index].emp_capacity * 2;
+    if (newCapacity < minCapacity)
+        newCapacity = minCapacity;
+    if (newCapacity < 10)
+        newCapacity = 10;
+
+    int* newArray = new int[newCapacity];
+    for (int i = 0; i < departments_list[dept_index].emp_count; i++)
+        newArray[i] = departments_list[dept_index].emp_ids[i];
+
+    delete[] departments_list[dept_index].emp_ids;
+    departments_list[dept_index].emp_ids = newArray;
+    departments_list[dept_index].emp_capacity = newCapacity;
+}
+
+static void addEmployeeToDepartment(int emp_id, const char* dept_name)
+{
+    int dept_index = findDepartmentIndex(dept_name);
+    if (dept_index == -1)
+    {
+        cout << "Warning: Department \"" << dept_name << "\" not found. Employee stored without department link.\n";
+        return;
+    }
+
+    // prevent duplicates
+    for (int i = 0; i < departments_list[dept_index].emp_count; i++)
+    {
+        if (departments_list[dept_index].emp_ids[i] == emp_id)
+            return;
+    }
+
+    ensureDepartmentCapacity(dept_index, departments_list[dept_index].emp_count + 1);
+    departments_list[dept_index].emp_ids[departments_list[dept_index].emp_count++] = emp_id;
+}
+
+static void removeEmployeeFromDepartment(int emp_id, const char* dept_name)
+{
+    int dept_index = findDepartmentIndex(dept_name);
+    if (dept_index == -1)
+        return;
+
+    for (int i = 0; i < departments_list[dept_index].emp_count; i++)
+    {
+        if (departments_list[dept_index].emp_ids[i] == emp_id)
+        {
+            for (int j = i; j < departments_list[dept_index].emp_count - 1; j++)
+                departments_list[dept_index].emp_ids[j] = departments_list[dept_index].emp_ids[j + 1];
+            departments_list[dept_index].emp_count--;
+            return;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Employee Management
+// ---------------------------------------------------------------------------
 void addEmployee()
 {
-    if (employeeCount >= MAX_EMPLOYEES)
+    if (employee_count >= MAX_EMPLOYEES)
     {
-        cout << "Employee list is full\n";
+        cout << "Employee list is full. Cannot add more employees.\n";
         return;
     }
-    Employee e;
+
+    Employee record;
     cout << "Enter Employee ID: ";
-    cin >> e.id;
+    cin >> record.emp_id;
+    if (cin.fail())
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Invalid ID entered.\n";
+        return;
+    }
+    if (findEmployeeIndex(record.emp_id) != -1)
+    {
+        cout << "Employee ID already exists.\n";
+        cin.ignore(1000, '\n');
+        return;
+    }
+
     cin.ignore(1000, '\n');
     cout << "Enter Name: ";
-    cin.getline(e.name, 50);
+    cin.getline(record.emp_name, 50);
+    if (stringEmpty(record.emp_name))
+    {
+        cout << "Name cannot be empty.\n";
+        return;
+    }
+
     cout << "Enter Department: ";
-    cin.getline(e.department, 30);
+    cin.getline(record.dept_name, 30);
+    if (stringEmpty(record.dept_name))
+    {
+        cout << "Department cannot be empty.\n";
+        return;
+    }
+
     cout << "Enter Salary: ";
-    cin >> e.salary;
+    cin >> record.salary;
+    if (cin.fail() || record.salary < 0)
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Invalid salary.\n";
+        return;
+    }
     cin.ignore(1000, '\n');
-    e.attendance = 0;
-    e.performance = 0;
-    e.bonusEligible = 0;
-    employees[employeeCount] = e;
-    employeeCount++;
-    cout << "Employee added\n";
+
+    record.attendance = 0;
+    record.performance = 0;
+    record.bonus_eligible = 0;
+
+    employees_list[employee_count++] = record;
+    addEmployeeToDepartment(record.emp_id, record.dept_name);
+    cout << "Employee added successfully.\n";
 }
 
-// 2) Remove an employee by ID
-void removeEmployee(int id)
+void removeEmployee(int emp_id)
 {
-    int idx = -1;
-    for (int i = 0; i < employeeCount; i++)
-        if (employees[i].id == id)
-        {
-            idx = i;
-            break;
-        }
+    int idx = findEmployeeIndex(emp_id);
     if (idx == -1)
     {
-        cout << "Employee not found\n";
+        cout << "Employee not found.\n";
         return;
     }
-    for (int i = idx; i < employeeCount - 1; i++)
-        employees[i] = employees[i + 1];
-    employeeCount--;
-    cout << "Employee removed\n";
+
+    removeEmployeeFromDepartment(emp_id, employees_list[idx].dept_name);
+
+    for (int i = idx; i < employee_count - 1; i++)
+        employees_list[i] = employees_list[i + 1];
+    employee_count--;
+
+    cout << "Employee removed successfully.\n";
 }
 
-// 3) Mark / update attendance for a specific employee ID
-void markAttendance(int id)
+void markAttendance(int emp_id)
 {
-    for (int i = 0; i < employeeCount; i++)
+    int idx = findEmployeeIndex(emp_id);
+    if (idx == -1)
     {
-        if (employees[i].id == id)
-        {
-            int a;
-            cout << "Enter new attendance: ";
-            cin >> a;
-            cin.ignore(1000, '\n');
-            employees[i].attendance = a;
-            cout << "Attendance updated\n";
-            return;
-        }
+        cout << "Employee not found.\n";
+        return;
     }
-    cout << "Employee not found\n";
+
+    int newAttendance;
+    cout << "Enter new attendance (0 - 365): ";
+    cin >> newAttendance;
+    if (cin.fail() || newAttendance < 0 || newAttendance > 365)
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "Invalid attendance value.\n";
+        return;
+    }
+    cin.ignore(1000, '\n');
+
+    employees_list[idx].attendance = newAttendance;
+    cout << "Attendance updated.\n";
 }
 
-// 4) Update performance score for a specific employee ID
-void updatePerformance(int id, double score)
+void updatePerformance(int emp_id, double score)
 {
-    for (int i = 0; i < employeeCount; i++)
+    int idx = findEmployeeIndex(emp_id);
+    if (idx == -1)
     {
-        if (employees[i].id == id)
-        {
-            employees[i].performance = score;
-            cout << "Performance updated\n";
-            return;
-        }
+        cout << "Employee not found.\n";
+        return;
     }
-    cout << "Employee not found\n";
+    if (score < 0 || score > 100)
+    {
+        cout << "Score must be between 0 and 100.\n";
+        return;
+    }
+
+    employees_list[idx].performance = score;
+    cout << "Performance updated.\n";
 }
 
-// 5) Calculate bonus eligibility for a specific employee ID
-//  hamara critera h    performance > 90 and attendance > 85
-void calculateBonus(int id)
+void calculateBonus(int emp_id)
 {
-    for (int i = 0; i < employeeCount; i++)
+    int idx = findEmployeeIndex(emp_id);
+    if (idx == -1)
     {
-        if (employees[i].id == id)
-        {
-            if (employees[i].performance > 90 && employees[i].attendance > 85)
-                employees[i].bonusEligible = 1;
-            else
-                employees[i].bonusEligible = 0;
-            cout << (employees[i].bonusEligible ? "Eligible" : "Not eligible") << '\n';
-            return;
-        }
+        cout << "Employee not found.\n";
+        return;
     }
-    cout << "Employee not found\n";
+
+    if (employees_list[idx].performance > 90 && employees_list[idx].attendance > 85)
+        employees_list[idx].bonus_eligible = 1;
+    else
+        employees_list[idx].bonus_eligible = 0;
+
+    cout << (employees_list[idx].bonus_eligible ? "Eligible" : "Not eligible") << '\n';
 }
 
-// 6) Display full details for one employee by ID
-void displayEmployee(int id)
+void displayEmployee(int emp_id)
 {
-    for (int i = 0; i < employeeCount; i++)
+    int idx = findEmployeeIndex(emp_id);
+    if (idx == -1)
     {
-        if (employees[i].id == id)
-        {
-            cout << "ID: " << employees[i].id << '\n';
-            cout << "Name: " << employees[i].name << '\n';
-            cout << "Department: " << employees[i].department << '\n';
-            cout << "Salary: " << employees[i].salary << '\n';
-            cout << "Attendance: " << employees[i].attendance << '\n';
-            cout << "Performance: " << employees[i].performance << '\n';
-            cout << "Bonus: " << (employees[i].bonusEligible ? "Yes" : "No") << '\n';
-            return;
-        }
+        cout << "Employee not found.\n";
+        return;
     }
-    cout << "Employee not found\n";
+
+    Employee& record = employees_list[idx];
+    cout << "ID: " << record.emp_id << '\n';
+    cout << "Name: " << record.emp_name << '\n';
+    cout << "Department: " << record.dept_name << '\n';
+    cout << "Salary: " << record.salary << '\n';
+    cout << "Attendance: " << record.attendance << '\n';
+    cout << "Performance: " << record.performance << '\n';
+    cout << "Bonus Eligible: " << (record.bonus_eligible ? "Yes" : "No") << '\n';
 }
 
-// FILE HANDLING – EMPLOYEES (BINARY FILE)
-
-void loadEmployeesFromBinary(const char *filename)
+// ---------------------------------------------------------------------------
+// File Handling – Employees (binary)
+// ---------------------------------------------------------------------------
+void loadEmployeesFromBinary(const char* filename)
 {
     ifstream fin(filename, ios::binary);
+    employee_count = 0;
     if (!fin)
         return;
-    int cnt = 0;
-    fin.read((char *)&cnt, sizeof(int));
-    if (cnt < 0)
-        cnt = 0;
-    if (cnt > MAX_EMPLOYEES)
-        cnt = MAX_EMPLOYEES;
-    fin.read((char *)employees, cnt * sizeof(Employee));
-    if (fin)
-        employeeCount = cnt;
-    else
-        employeeCount = 0;
-    fin.close();
+
+    int stored_count = 0;
+    fin.read(reinterpret_cast<char*>(&stored_count), sizeof(int));
+    if (!fin)
+        return;
+
+    if (stored_count < 0)
+        stored_count = 0;
+    if (stored_count > MAX_EMPLOYEES)
+        stored_count = MAX_EMPLOYEES;
+
+    fin.read(reinterpret_cast<char*>(employees_list), stored_count * sizeof(Employee));
+    if (!fin)
+    {
+        employee_count = 0;
+        return;
+    }
+
+    employee_count = stored_count;
 }
 
-void saveEmployeesToBinary(const char *filename)
+void saveEmployeesToBinary(const char* filename)
 {
     ofstream fout(filename, ios::binary);
     if (!fout)
+    {
+        cout << "Unable to open employee file for writing.\n";
         return;
-    int cnt = employeeCount;
-    fout.write((char *)&cnt, sizeof(int));
-    if (cnt > 0)
-        fout.write((char *)employees, cnt * sizeof(Employee));
-    fout.close();
+    }
+
+    fout.write(reinterpret_cast<const char*>(&employee_count), sizeof(int));
+    if (employee_count > 0)
+        fout.write(reinterpret_cast<const char*>(employees_list), employee_count * sizeof(Employee));
 }
