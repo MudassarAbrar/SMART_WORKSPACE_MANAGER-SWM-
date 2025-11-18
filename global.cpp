@@ -129,7 +129,7 @@ bool stringsEqual(const char* a, const char* b)
     }
     return true;
 }
-
+// Department ka index name se dhoondhna
 int findDepartmentIndexByName(const char dept_name[])
 {
     for (int i = 0; i < department_count; i++)
