@@ -98,16 +98,16 @@ void freeMemory()
 
      if (employees_list != nullptr)
     {
-        for (int i = 0; i < employee_count; i++)
-        {
-            employees_list[i].emp_id = -1;
-            employees_list[i].emp_name[0] = '\0';
-            employees_list[i].dept_name[0] = '\0';
-            employees_list[i].salary = 0.0;
-            employees_list[i].attendance = 0;
-            employees_list[i].performance = 0.0;
-            employees_list[i].bonus_eligible = false;
-        }
+        // for (int i = 0; i < employee_count; i++)
+        // {
+        //     employees_list[i].emp_id = -1;
+        //     employees_list[i].emp_name[0] = '\0';
+        //     employees_list[i].dept_name[0] = '\0';
+        //     employees_list[i].salary = 0.0;
+        //     employees_list[i].attendance = 0;
+        //     employees_list[i].performance = 0.0;
+        //     employees_list[i].bonus_eligible = false;
+        // }
 
         delete[] employees_list;
         employees_list = nullptr;

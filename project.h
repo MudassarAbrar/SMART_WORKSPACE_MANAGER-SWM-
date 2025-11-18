@@ -96,7 +96,7 @@ int getBestEmployeeInDepartment(int idx);
 void displayDepartment(char deptName[]);
 
 // 11) Get average performance of a given department
-double getDeptAvgPerformance(char deptName[]);
+double getDeptAvgPerformance(const char* deptName);
 
 // 12) Display department capacity information
 void displayDeptCapacity(char deptName[]);

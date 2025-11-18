@@ -1,6 +1,7 @@
 #include "project.h"
 #include <iostream>
 #include <fstream>
+#include <cstring> // Fix: Include <cstring> for strcpy
 
 using namespace std;
 //To avoid duplicate symbols during linking, helpers are kept file-private using static.
@@ -86,7 +87,7 @@ static void ensureDepartmentCapacity(int dept_index, int minCapacity)
 // ---------------------------------------------------------------------------
 void addDepartment(char deptName[], int capacity)
 {
-    if (department_count >= MAX_EMP_PER_DEPT)
+    if (department_count >= MAX_DEPARTMENTS)
     {
         cout << "Department list is full.\n";
         return;
@@ -95,34 +96,35 @@ void addDepartment(char deptName[], int capacity)
     {
         cout << "Department name cannot be empty.\n";
         return;
-    }//if the department exists already then return
+    }
     if (findDepartmentIndexByName(deptName) != -1)
     {
         cout << "Department already exists.\n";
         return;
     }
-    //if the capacity is less than 0 then return
     if (capacity <= 0)
     {
         cout << "Capacity must be greater than 0.\n";
         return;
     }
-    //if the capacity is greater than 100 then return
     if (capacity > MAX_EMP_PER_DEPT)
     {
-        cout << "Capacity too large. Maximum allowed is " << MAX_EMPLOYEES << " employees.\n";
+        cout << "Capacity too large. Maximum allowed is " << MAX_EMP_PER_DEPT << " employees.\n";
         return;
     }
 
-       // Add the new department
-    strcpy(departments_list[department_count].name, deptName);
-    departments_list[department_count].capacity = capacity;
-    departments_list[department_count].emp_count = 0;
-    departments_list[department_count].emp_ids = new int[capacity];
-  
+    // Add the new department
+    Department& slot = departments_list[department_count];
+    strcpy(slot.dept_name, deptName); // Fix: Use dept_name instead of name
+    slot.emp_capacity = capacity;    // Fix: Use emp_capacity instead of capacity
+    slot.emp_count = 0;
+
+    // Dynamically allocate the emp_ids array
+    slot.emp_ids = new int[slot.emp_capacity];
+
     department_count++;
 
-    cout << "Department "<<deptName<<" added with capacity: " << capacity << ".\n";
+    cout << "Department " << deptName << " added with capacity: " << capacity << ".\n";
 }
 
 void removeDepartment(char deptName[])

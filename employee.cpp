@@ -96,11 +96,11 @@ static void removeEmployeeFromDepartment(int emp_id, const char* dept_name)
 // ---------------------------------------------------------------------------
 void addEmployee()
 {
-    if (employee_count >= MAX_EMP_PER_DEPT)
-    {
-        cout << "Employee list is full. Cannot add more employees.\n";
-        return;
-    }
+    // if (employee_count >= MAX_EMP_PER_DEPT)
+    // {
+    //     cout << "Employee list is full. Cannot add more employees.\n";
+    //     return;
+    // }
 
     Employee record;
 
@@ -159,28 +159,65 @@ void addEmployee()
 
     cout << "Employee added successfully.\n";
 }
-
 void removeEmployee(int emp_id)
 {
-    int idx = findEmployeeIndex(emp_id);
-    if (idx == -1)
+    ifstream fin("employee.txt");
+    if (!fin)
     {
-        cout << "Employee not found.\n";
+        cout << "Unable to open employee file for reading.\n";
         return;
     }
 
-// Department mapping se bhi hata do
-    removeEmployeeFromDepartment(emp_id, employees_list[idx].dept_name);
+    ofstream fout("employee_temp.txt");
+    if (!fout)
+    {
+        cout << "Unable to open temporary file for writing.\n";
+        fin.close();
+        return;
+    }
 
-// Employee array mein se remove (shift)
-    for (int i = idx; i < employee_count - 1; i++)
-        employees_list[i] = employees_list[i + 1];
+    bool employeeFound = false;
+    Employee emp;
 
-    employee_count--;
+    // Read from the original file and write to the temporary file
+    while (fin >> emp.emp_id >> emp.emp_name >> emp.dept_name >> emp.salary
+               >> emp.attendance >> emp.performance >> emp.bonus_eligible)
+    {
+        if (emp.emp_id == emp_id)
+        {
+            // Skip the employee to be removed
+            employeeFound = true;
+            removeEmployeeFromDepartment(emp.emp_id, emp.dept_name);
+            continue;
+        }
 
-    cout << "Employee removed successfully.\n";
+        // Write all other employees to the temporary file
+        fout << emp.emp_id << " "
+             << emp.emp_name << " "
+             << emp.dept_name << " "
+             << emp.salary << " "
+             << emp.attendance << " "
+             << emp.performance << " "
+             << emp.bonus_eligible << "\n";
+    }
+
+    fin.close();
+    fout.close();
+
+    // Replace the original file with the updated file
+    if (employeeFound)
+    {
+        remove("employee.txt");
+        rename("employee_temp.txt", "employee.txt");
+        cout << "Employee ID " << emp_id << " removed successfully.\n";
+    }
+    else
+    {
+        // If the employee was not found, delete the temporary file
+        remove("employee_temp.txt");
+        cout << "Employee ID " << emp_id << " not found.\n";
+    }
 }
-
 void markAttendance(int emp_id)
 {
     int idx = findEmployeeIndex(emp_id);

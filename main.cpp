@@ -157,7 +157,7 @@ void handleDepartmentManagement()
         int choice;
         cin >> choice;
 
-        if (cin.fail()) // cin.fail() check karega input galat to nahi
+        if (cin.fail())
         {
             cin.clear();
             cin.ignore(1000, '\n');
@@ -185,23 +185,27 @@ void handleDepartmentManagement()
         }
 
         case 2:
+        {
             cout << "Enter Department Name to remove: ";
             cin.getline(deptName, 30);
             removeDepartment(deptName);
             break;
+        }
 
         case 3:
+        {
             cout << "Enter Department Name to display: ";
             cin.getline(deptName, 30);
             displayDepartment(deptName);
             break;
+        }
 
         case 4:
         {
             cout << "Enter Department Name to find top performer: ";
             cin.getline(deptName, 30);
             int deptIdx = findDepartmentIndexByName(deptName);
-                int topId = getBestEmployeeInDepartment(deptIdx);
+            int topId = getBestEmployeeInDepartment(deptIdx);
             if (topId == -1)
                 cout << "No employees found or department missing.\n";
             else
@@ -211,7 +215,7 @@ void handleDepartmentManagement()
         }
 
         case 5:
-             
+        {
             cout << "Enter Department Name to get average performance: ";
             cin.getline(deptName, 30);
             int deptIdx = findDepartmentIndexByName(deptName);
@@ -228,12 +232,15 @@ void handleDepartmentManagement()
                     cout << "Average performance: " << avgPerformance << '\n';
             }
             break;
+        }
 
         case 6:
+        {
             cout << "Enter Department Name to check capacity: ";
             cin.getline(deptName, 30);
             displayDeptCapacity(deptName);
             break;
+        }
 
         case 0:
             back = true;
@@ -360,8 +367,10 @@ int main()
     initializeMemory();
 
     // File se data load karo (agar files existing hain to)
-    loadEmployeesFromText("employee.txt");
     loadDepartmentsFromText("departments.txt");
+
+    loadEmployeesFromText("employee.txt");
+   
     loadMeetingsFromText("meetings.txt");
 
     cout << "============================================\n";
