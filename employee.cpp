@@ -4,40 +4,23 @@
 
 using namespace std;
 
-// Simple helper to copy C-style string safely
-static void copyString(char* dest, const char* src, int destSize)
-{
-    if (destSize <= 0)
-        return;
 
-    int i = 0;
-    while (i < destSize - 1 && src[i] != '\0')
-    {
-        dest[i] = src[i];
-        i++;
-    }
-    dest[i] = '\0';
-}
 
-static bool stringEmpty(const char* text)
-{
-    return text[0] == '\0';
-}
 
 // ---------------------------------------------------------------------------
 // Lookups & validations
 // ---------------------------------------------------------------------------
 
-// Employee list mein given ID ka index dhoondta hai
-static int findEmployeeIndex(int emp_id)
-{
-    for (int i = 0; i < employee_count; i++)
-    {
-        if (employees_list[i].emp_id == emp_id)
-            return i;
-    }
-    return -1;
-}
+// // Employee list mein given ID ka index dhoondta hai
+// static int findEmployeeIndex(int emp_id)
+// {
+//     for (int i = 0; i < employee_count; i++)
+//     {
+//         if (employees_list[i].emp_id == emp_id)
+//             return i;
+//     }
+//     return -1;
+// }
 
 
 // Agar department ke andar capacity kam ho, to resize kar do

@@ -10,15 +10,15 @@ using namespace std;
 //Other files cannot accidentally access or redefine them
 //Encapsulation is maintained
 // Simple string compare function
-static int findEmployeeIndex(int empId)
-{
-    for (int i = 0; i < employee_count; i++)
-    {
-        if (employees_list[i].emp_id == empId)
-            return i;
-    }
-    return -1;  // not found
-}
+// static int findEmployeeIndex(int empId)
+// {
+//     for (int i = 0; i < employee_count; i++)
+//     {
+//         if (employees_list[i].emp_id == empId)
+//             return i;
+//     }
+//     return -1;  // not found
+// }
 
 // static bool stringsEqual(const char* a, const char* b)
 // {
@@ -33,21 +33,21 @@ static int findEmployeeIndex(int empId)
 // }
 
 // Safe copy for C-strings
-static void copyString(char* dest, const char* src, int destSize)
-{
-    int i = 0;
-    while (i < destSize - 1 && src[i] != '\0')
-    {
-        dest[i] = src[i];
-        i++;
-    }
-    dest[i] = '\0';
-}
+// static void copyString(char* dest, const char* src, int destSize)
+// {
+//     int i = 0;
+//     while (i < destSize - 1 && src[i] != '\0')
+//     {
+//         dest[i] = src[i];
+//         i++;
+//     }
+//     dest[i] = '\0';
+// }
 
-static bool stringEmpty(const char* text)
-{
-    return text[0] == '\0';
-}
+// static bool stringEmpty(const char* text)
+// {
+//     return text[0] == '\0';
+// }
 
 // ---------------------------------------------------------------------------
 // Helpers

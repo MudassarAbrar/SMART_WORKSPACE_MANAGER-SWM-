@@ -6,10 +6,10 @@ using namespace std;
 
 
 
-static bool stringEmpty(const char *text)
-{
-    return text[0] == '\0';
-}
+// static bool stringEmpty(const char *text)
+// {
+//     return text[0] == '\0';
+// }
 
 // Meeting ID se index find karna (global meetings_list mein)
 static int findMeetingIndex(int meet_id)

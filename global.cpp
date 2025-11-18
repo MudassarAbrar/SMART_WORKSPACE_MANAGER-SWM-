@@ -139,3 +139,34 @@ int findDepartmentIndexByName(const char dept_name[])
     }
     return -1;
 }
+
+// Simple helper to copy C-style string safely
+void copyString(char* dest, const char* src, int destSize)
+{
+    if (destSize <= 0)
+        return;
+
+    int i = 0;
+    while (i < destSize - 1 && src[i] != '\0')
+    {
+        dest[i] = src[i];
+        i++;
+    }
+    dest[i] = '\0';
+}
+//check if string is empty
+bool stringEmpty(const char* text)
+{
+    return text[0] == '\0';
+}
+// Find employee index by ID in global employees_list
+int findEmployeeIndex(int empId)
+{
+    for (int i = 0; i < employee_count; i++)
+    {
+        if (employees_list[i].emp_id == empId)
+            return i;
+    }
+    return -1;  // not found
+}
+

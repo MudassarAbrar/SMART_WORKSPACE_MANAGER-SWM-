@@ -55,6 +55,11 @@ extern int         meeting_count;
 // global function prototypes
 // Department ka index name se dhoondhna
 extern int findDepartmentIndexByName(const char dept_name[]);
+extern void copyString(char* dest, const char* src, int destSize);
+extern bool stringEmpty(const char* text);
+extern int findEmployeeIndex(int empId);
+
+
 
 // String compare: true agar dono same hain
 extern bool stringsEqual(const char* a, const char* b);
