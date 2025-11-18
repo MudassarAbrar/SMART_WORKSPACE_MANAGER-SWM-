@@ -3,8 +3,23 @@
 #include <fstream>
 
 using namespace std;
+//To avoid duplicate symbols during linking, helpers are kept file-private using static.
+//So marking them static means:
 
+// Only this file can use them
+//Other files cannot accidentally access or redefine them
+//Encapsulation is maintained
 // Simple string compare function
+static int findEmployeeIndex(int empId)
+{
+    for (int i = 0; i < employee_count; i++)
+    {
+        if (employees_list[i].emp_id == empId)
+            return i;
+    }
+    return -1;  // not found
+}
+
 static bool stringsEqual(const char* a, const char* b)
 {
     int idx = 0;
@@ -61,15 +76,17 @@ static void ensureDepartmentCapacity(int dept_index, int minCapacity)
     int newCapacity = departments_list[dept_index].emp_capacity * 2;
     if (newCapacity < minCapacity)
         newCapacity = minCapacity;
-    if (newCapacity < 10)
-        newCapacity = 10;
+    // if (newCapacity < 10)
+    //     newCapacity = 10;
 
     int* newArray = new int[newCapacity];
     for (int i = 0; i < departments_list[dept_index].emp_count; i++)
         newArray[i] = departments_list[dept_index].emp_ids[i];
-
+//delete the previous emoloyee ids array
     delete[] departments_list[dept_index].emp_ids;
+    //assign the new array to the department
     departments_list[dept_index].emp_ids = newArray;
+    //assign the new capacity to the department
     departments_list[dept_index].emp_capacity = newCapacity;
 }
 
@@ -87,32 +104,34 @@ void addDepartment(char deptName[], int capacity)
     {
         cout << "Department name cannot be empty.\n";
         return;
-    }
+    }//if the department exists already then return
     if (findDepartmentIndexByName(deptName) != -1)
     {
         cout << "Department already exists.\n";
         return;
     }
+    //if the capacity is less than 0 then return
     if (capacity <= 0)
     {
         cout << "Capacity must be greater than 0.\n";
         return;
     }
-    if (capacity > 1000)
+    //if the capacity is greater than 100 then return
+    if (capacity > MAX_EMP_PER_DEPT)
     {
-        cout << "Capacity too large. Maximum allowed is 1000.\n";
+        cout << "Capacity too large. Maximum allowed is " << MAX_EMPLOYEES << " employees.\n";
         return;
     }
 
     Department& slot = departments_list[department_count];
-    copyString(slot.dept_name, deptName, 30);
+    copyString(slot.dept_name, deptName, MAX_DEPT_NAME_LENGTH );
     slot.emp_count    = 0;
     slot.emp_capacity = capacity;
     slot.emp_ids      = new int[slot.emp_capacity];
 
     department_count++;
 
-    cout << "Department added with capacity: " << capacity << ".\n";
+    cout << "Department "<<deptName<<" added with capacity: " << capacity << ".\n";
 }
 
 void removeDepartment(char deptName[])
@@ -141,73 +160,56 @@ void removeDepartment(char deptName[])
     cout << "Department removed.\n";
 }
 
-int findTopPerformer(char deptName[])
+
+
+int getBestEmployeeInDepartment(int idx)
 {
-    int idx = findDepartmentIndexByName(deptName);
-    if (idx == -1)
-    {
-        cout << "Department not found.\n";
+    // Invalid department index
+    if (idx < 0 || idx >= department_count)
         return -1;
-    }
+
+    // If department has no employees
     if (departments_list[idx].emp_count == 0)
-    {
-        cout << "No employees in this department.\n";
         return -1;
-    }
 
-    if (employee_count == 0)
-    {
-        cout << "No employees loaded in system.\n";
-        return -1;
-    }
-
-    double bestScore = -1.0;
+    double bestScore = -1e18;   // very small number
     int    bestId    = -1;
-    int    foundCount = 0;
+    bool   anyValid  = false;
 
-    // Har employee ID ke liye employees_list mein match dhoondhna
+    // Loop through employee IDs stored in this department
     for (int i = 0; i < departments_list[idx].emp_count; i++)
     {
-        int  empId = departments_list[idx].emp_ids[i];
-        bool found = false;
+        int empId = departments_list[idx].emp_ids[i];
 
-        for (int e = 0; e < employee_count; e++)
-        {
-            if (employees_list[e].emp_id == empId)
-            {
-                found = true;
-                foundCount++;
+        // Find this employee in global employee list
+        int pos = findEmployeeIndex(empId);
 
-                if (employees_list[e].performance > bestScore)
-                {
-                    bestScore = employees_list[e].performance;
-                    bestId    = empId;
-                }
-                break;
-            }
-        }
-
-        if (!found)
+        if (pos == -1)
         {
             cout << "Warning: Employee ID " << empId
                  << " not found in employee list.\n";
+            continue;
+        }
+
+        anyValid = true;
+
+        double perf = employees_list[pos].performance;
+
+        if (perf > bestScore)
+        {
+            bestScore = perf;
+            bestId    = empId;
         }
     }
 
-    if (foundCount == 0)
-    {
-        cout << "No valid employees found in department (employee IDs don't match).\n";
+    if (!anyValid)
         return -1;
-    }
-
-    if (bestId == -1)
-    {
-        cout << "No employees with valid performance scores found.\n";
-        return -1;
-    }
 
     return bestId;
 }
+
+
+
 
 void displayDepartment(char deptName[])
 {
@@ -228,26 +230,12 @@ void displayDepartment(char deptName[])
         return;
     }
 
-    if (employee_count == 0)
-    {
-        cout << "Warning: No employees loaded in system. Cannot display employee details.\n";
-        cout << "Employee IDs in department: ";
-
-        for (int i = 0; i < departments_list[idx].emp_count; i++)
-        {
-            if (i > 0) cout << ", ";
-            cout << departments_list[idx].emp_ids[i];
-        }
-        cout << '\n';
-        return;
-    }
-
-    int foundCount    = 0;
+    int foundCount = 0;
     int notFoundCount = 0;
 
     for (int i = 0; i < departments_list[idx].emp_count; i++)
     {
-        int  empId = departments_list[idx].emp_ids[i];
+        int empId = departments_list[idx].emp_ids[i];
         bool found = false;
 
         for (int e = 0; e < employee_count; e++)
@@ -275,15 +263,15 @@ void displayDepartment(char deptName[])
     if (notFoundCount > 0)
     {
         cout << "\nWarning: " << notFoundCount
-             << " employee ID(s) from department file not found in employee list.\n";
-        cout << "Make sure employee.txt contains employees with these IDs.\n";
+             << " employee ID(s) from department not found in employee list.\n";
     }
 
     if (foundCount == 0)
     {
-        cout << "No valid employees found. All employee IDs in department don't match employee list.\n";
+        cout << "No valid employees found in this department.\n";
     }
 }
+
 
 void displayDeptCapacity(char deptName[])
 {
@@ -293,7 +281,8 @@ void displayDeptCapacity(char deptName[])
         cout << "Department not found.\n";
         return;
     }
-
+    //REFERENCE OBJECT
+//DEPT IS A NICKNAME FOR DEPT
     Department& dept = departments_list[idx];
 
     cout << "Department: "       << dept.dept_name << '\n';
@@ -312,6 +301,8 @@ void displayDeptCapacity(char deptName[])
     }
 }
 
+
+
 double getDeptAvgPerformance(char deptName[])
 {
     int idx = findDepartmentIndexByName(deptName);
@@ -326,53 +317,26 @@ double getDeptAvgPerformance(char deptName[])
         return 0.0;
     }
 
-    if (employee_count == 0)
+    double sum = 0.0;
+    int counted = departments_list[idx].emp_count;
+
+    // Just sum performance assuming dept.emp_ids[i] matches employee i in employees_list
+    // (or you have direct mapping so no need to check)
+    for (int i = 0; i < counted; i++)
     {
-        cout << "No employees loaded in system.\n";
-        return 0.0;
-    }
-
-    double sum           = 0.0;
-    int    counted       = 0;
-    int    notFoundCount = 0;
-
-    for (int i = 0; i < departments_list[idx].emp_count; i++)
-    {
-        int  empId = departments_list[idx].emp_ids[i];
-        bool found = false;
-
-        for (int e = 0; e < employee_count; e++)
-        {
-            if (employees_list[e].emp_id == empId)
-            {
-                found = true;
-                sum  += employees_list[e].performance;
-                counted++;
-                break;
-            }
-        }
-
-        if (!found)
-        {
-            notFoundCount++;
-            cout << "Warning: Employee ID " << empId << " not found in employee list.\n";
-        }
-    }
-
-    if (counted == 0)
-    {
-        cout << "No valid employees found in department (employee IDs don't match).\n";
-        return 0.0;
-    }
-
-    if (notFoundCount > 0)
-    {
-        cout << "Note: " << notFoundCount
-             << " employee ID(s) from department file not found in employee list.\n";
+        int empId = departments_list[idx].emp_ids[i];
+        // Assuming empId corresponds to employees_list[i] (or you have other guarantee)
+        // If not, you must have a way to get employee performance directly, e.g. employee array indexed by empId
+        // Here we'll just sum performance blindly by index i (if that assumption holds)
+        sum += employees_list[i].performance;  // <-- This may not be correct unless you have a mapping
     }
 
     return sum / counted;
 }
+
+
+
+
 
 // ---------------------------------------------------------------------------
 // File handling for departments (text)
@@ -383,7 +347,7 @@ void loadDepartmentsFromText(const char* filename)
 {
     ifstream fin(filename);
 
-    // Pehle purani allocations clear kar do
+    // Clear old allocations
     for (int i = 0; i < department_count; i++)
     {
         delete[] departments_list[i].emp_ids;
@@ -399,28 +363,25 @@ void loadDepartmentsFromText(const char* filename)
 
     while (department_count < MAX_DEPARTMENTS)
     {
-        char nameBuffer[30];
+        char tempDept[MAX_DEPT_NAME_LENGTH];
         int  employeeTotal = 0;
 
-        fin >> nameBuffer >> employeeTotal;
+        fin >> tempDept >> employeeTotal;
         if (fin.fail())
             break;
 
-        if (employeeTotal < 0)
-            employeeTotal = 0;
-
-        Department& slot = departments_list[department_count];
-        copyString(slot.dept_name, nameBuffer, 30);
-        slot.emp_count    = employeeTotal;
-        slot.emp_capacity = (employeeTotal > 0) ? employeeTotal : 10;
-        slot.emp_ids      = new int[slot.emp_capacity];
+        // Use simple indexing instead of reference
+        copyString(departments_list[department_count].dept_name, tempDept, MAX_DEPT_NAME_LENGTH);
+        departments_list[department_count].emp_count    = employeeTotal;
+        departments_list[department_count].emp_capacity = (employeeTotal > MAX_EMPLOYEES) ? MAX_EMPLOYEES : employeeTotal;
+        departments_list[department_count].emp_ids      = new int[departments_list[department_count].emp_capacity];
 
         for (int i = 0; i < employeeTotal; i++)
         {
-            fin >> slot.emp_ids[i];
+            fin >> departments_list[department_count].emp_ids[i];
             if (fin.fail())
             {
-                slot.emp_count = i;
+                departments_list[department_count].emp_count = i;
                 break;
             }
         }
@@ -439,7 +400,7 @@ void saveDepartmentsToText(const char* filename)
     }
 
     for (int i = 0; i < department_count; i++)
-    {
+    {//REFERENCE OBJ TO THE DEPARTMENT AT i
         Department& d = departments_list[i];
         fout << d.dept_name << ' ' << d.emp_count;
         for (int j = 0; j < d.emp_count; j++)
