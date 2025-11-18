@@ -19,19 +19,6 @@ static void copyString(char* dest, const char* src, int destSize)
     dest[i] = '\0';
 }
 
-// String compare: true agar dono same hain
-static bool stringsEqual(const char* a, const char* b)
-{
-    int idx = 0;
-    while (a[idx] != '\0' || b[idx] != '\0')
-    {
-        if (a[idx] != b[idx])
-            return false;
-        idx++;
-    }
-    return true;
-}
-
 static bool stringEmpty(const char* text)
 {
     return text[0] == '\0';
@@ -52,16 +39,6 @@ static int findEmployeeIndex(int emp_id)
     return -1;
 }
 
-// Department ka index name se dhoondna
-static int findDepartmentIndex(const char* dept_name)
-{
-    for (int i = 0; i < department_count; i++)
-    {
-        if (stringsEqual(departments_list[i].dept_name, dept_name))
-            return i;
-    }
-    return -1;
-}
 
 // Agar department ke andar capacity kam ho, to resize kar do
 static void ensureDepartmentCapacity(int dept_index, int minCapacity)
@@ -90,7 +67,7 @@ static void ensureDepartmentCapacity(int dept_index, int minCapacity)
 // Employee ko department ke emp_ids array mein add karna
 static void addEmployeeToDepartment(int emp_id, const char* dept_name)
 {
-    int dept_index = findDepartmentIndex(dept_name);
+    int dept_index = findDepartmentIndexByName(dept_name);
     if (dept_index == -1)
     {
         cout << "Warning: Department \"" << dept_name
@@ -98,7 +75,7 @@ static void addEmployeeToDepartment(int emp_id, const char* dept_name)
         return;
     }
 
-    // duplicate employee ID mat add karo
+// duplicate employee ID mat add karo
     for (int i = 0; i < departments_list[dept_index].emp_count; i++)
     {
         if (departments_list[dept_index].emp_ids[i] == emp_id)
@@ -108,11 +85,12 @@ static void addEmployeeToDepartment(int emp_id, const char* dept_name)
     ensureDepartmentCapacity(dept_index, departments_list[dept_index].emp_count + 1);
     departments_list[dept_index].emp_ids[departments_list[dept_index].emp_count++] = emp_id;
 }
+// isme bhi extra condition lgi hui h
 
 // Department se employee ID remove karna (agar exist karta ho)
 static void removeEmployeeFromDepartment(int emp_id, const char* dept_name)
 {
-    int dept_index = findDepartmentIndex(dept_name);
+    int dept_index = findDepartmentIndexByName(dept_name);
     if (dept_index == -1)
         return;
 
@@ -188,8 +166,7 @@ void addEmployee()
         return;
     }
     cin.ignore(1000, '\n');
-
-    // default values jab naya employee add ho
+// default values jab naya employee add ho
     record.attendance      = 0;
     record.performance     = 0;
     record.bonus_eligible  = 0;
@@ -209,10 +186,10 @@ void removeEmployee(int emp_id)
         return;
     }
 
-    // Department mapping se bhi hata do
+// Department mapping se bhi hata do
     removeEmployeeFromDepartment(emp_id, employees_list[idx].dept_name);
 
-    // Employee array mein se remove (shift)
+// Employee array mein se remove (shift)
     for (int i = idx; i < employee_count - 1; i++)
         employees_list[i] = employees_list[i + 1];
 
@@ -274,7 +251,7 @@ void calculateBonus(int emp_id)
         return;
     }
 
-    // Simple rule: high performance + good attendance = bonus
+// Simple rule: high performance + good attendance = bonus
     if (employees_list[idx].performance > 90 && employees_list[idx].attendance > 85)
         employees_list[idx].bonus_eligible = 1;
     else
@@ -309,150 +286,150 @@ void displayEmployee(int emp_id)
 // emp_id|emp_name|dept_name|salary|attendance|performance|bonus_eligible
 // ---------------------------------------------------------------------------
 
-// Simple manual parser, taake external libraries use na karni pade
-static void parseEmployeeLine(const char* line, Employee& emp)
-{
-    int  i      = 0;
-    int  field  = 0;
-    char buffer[200];
-    int  bufIdx = 0;
+// // Simple manual parser, taake external libraries use na karni pade
+// static void parseEmployeeLine(const char* line, Employee& emp)
+// {
+//     int  i      = 0;
+//     int  field  = 0;
+//     char buffer[200];
+//     int  bufIdx = 0;
 
-    while (line[i] != '\0' && field < 7)
-    {
-        if (line[i] == '|')
-        {
-            buffer[bufIdx] = '\0';
-            bufIdx = 0;
+//     while (line[i] != '\0' && field < 7)
+//     {
+//         if (line[i] == '|')
+//         {
+//             buffer[bufIdx] = '\0';
+//             bufIdx = 0;
 
-            switch (field)
-            {
-            case 0: // emp_id
-            {
-                int val = 0;
-                int j   = 0;
-                while (buffer[j] != '\0')
-                {
-                    if (buffer[j] >= '0' && buffer[j] <= '9')
-                        val = val * 10 + (buffer[j] - '0');
-                    j++;
-                }
-                emp.emp_id = val;
-                break;
-            }
-            case 1: // emp_name
-                copyString(emp.emp_name, buffer, 50);
-                break;
-            case 2: // dept_name
-                copyString(emp.dept_name, buffer, 30);
-                break;
-            case 3: // salary
-            {
-                double val = 0.0;
-                int    j   = 0;
-                bool   neg = false;
+//             switch (field)
+//             {
+//             case 0: // emp_id
+//             {
+//                 int val = 0;
+//                 int j   = 0;
+//                 while (buffer[j] != '\0')
+//                 {
+//                     if (buffer[j] >= '0' && buffer[j] <= '9')
+//                         val = val * 10 + (buffer[j] - '0');
+//                     j++;
+//                 }
+//                 emp.emp_id = val;
+//                 break;
+//             }
+//             case 1: // emp_name
+//                 copyString(emp.emp_name, buffer, 50);
+//                 break;
+//             case 2: // dept_name
+//                 copyString(emp.dept_name, buffer, 30);
+//                 break;
+//             case 3: // salary
+//             {
+//                 double val = 0.0;
+//                 int    j   = 0;
+//                 bool   neg = false;
 
-                if (buffer[0] == '-')
-                {
-                    neg = true;
-                    j   = 1;
-                }
+//                 if (buffer[0] == '-')
+//                 {
+//                     neg = true;
+//                     j   = 1;
+//                 }
 
-                bool   afterDot = false;
-                double divisor  = 1.0;
+//                 bool   afterDot = false;
+//                 double divisor  = 1.0;
 
-                while (buffer[j] != '\0')
-                {
-                    if (buffer[j] == '.')
-                    {
-                        afterDot = true;
-                    }
-                    else if (buffer[j] >= '0' && buffer[j] <= '9')
-                    {
-                        if (afterDot)
-                        {
-                            divisor *= 10.0;
-                            val     = val + (buffer[j] - '0') / divisor;
-                        }
-                        else
-                        {
-                            val = val * 10.0 + (buffer[j] - '0');
-                        }
-                    }
-                    j++;
-                }
-                emp.salary = neg ? -val : val;
-                break;
-            }
-            case 4: // attendance
-            {
-                int val = 0;
-                int j   = 0;
-                while (buffer[j] != '\0')
-                {
-                    if (buffer[j] >= '0' && buffer[j] <= '9')
-                        val = val * 10 + (buffer[j] - '0');
-                    j++;
-                }
-                emp.attendance = val;
-                break;
-            }
-            case 5: // performance
-            {
-                double val = 0.0;
-                int    j   = 0;
-                bool   neg = false;
+//                 while (buffer[j] != '\0')
+//                 {
+//                     if (buffer[j] == '.')
+//                     {
+//                         afterDot = true;
+//                     }
+//                     else if (buffer[j] >= '0' && buffer[j] <= '9')
+//                     {
+//                         if (afterDot)
+//                         {
+//                             divisor *= 10.0;
+//                             val     = val + (buffer[j] - '0') / divisor;
+//                         }
+//                         else
+//                         {
+//                             val = val * 10.0 + (buffer[j] - '0');
+//                         }
+//                     }
+//                     j++;
+//                 }
+//                 emp.salary = neg ? -val : val;
+//                 break;
+//             }
+//             case 4: // attendance
+//             {
+//                 int val = 0;
+//                 int j   = 0;
+//                 while (buffer[j] != '\0')
+//                 {
+//                     if (buffer[j] >= '0' && buffer[j] <= '9')
+//                         val = val * 10 + (buffer[j] - '0');
+//                     j++;
+//                 }
+//                 emp.attendance = val;
+//                 break;
+//             }
+//             case 5: // performance
+//             {
+//                 double val = 0.0;
+//                 int    j   = 0;
+//                 bool   neg = false;
 
-                if (buffer[0] == '-')
-                {
-                    neg = true;
-                    j   = 1;
-                }
+//                 if (buffer[0] == '-')
+//                 {
+//                     neg = true;
+//                     j   = 1;
+//                 }
 
-                bool   afterDot = false;
-                double divisor  = 1.0;
+//                 bool   afterDot = false;
+//                 double divisor  = 1.0;
 
-                while (buffer[j] != '\0')
-                {
-                    if (buffer[j] == '.')
-                    {
-                        afterDot = true;
-                    }
-                    else if (buffer[j] >= '0' && buffer[j] <= '9')
-                    {
-                        if (afterDot)
-                        {
-                            divisor *= 10.0;
-                            val     = val + (buffer[j] - '0') / divisor;
-                        }
-                        else
-                        {
-                            val = val * 10.0 + (buffer[j] - '0');
-                        }
-                    }
-                    j++;
-                }
-                emp.performance = neg ? -val : val;
-                break;
-            }
-            case 6: // bonus_eligible
-            {
-                int val = 0;
-                if (buffer[0] == '1')
-                    val = 1;
-                emp.bonus_eligible = val;
-                break;
-            }
-            }
-            field++;
-        }
-        else
-        {
-            if (bufIdx < 199)
-                buffer[bufIdx++] = line[i];
-        }
-        i++;
-    }
-}
+//                 while (buffer[j] != '\0')
+//                 {
+//                     if (buffer[j] == '.')
+//                     {
+//                         afterDot = true;
+//                     }
+//                     else if (buffer[j] >= '0' && buffer[j] <= '9')
+//                     {
+//                         if (afterDot)
+//                         {
+//                             divisor *= 10.0;
+//                             val     = val + (buffer[j] - '0') / divisor;
+//                         }
+//                         else
+//                         {
+//                             val = val * 10.0 + (buffer[j] - '0');
+//                         }
+//                     }
+//                     j++;
+//                 }
+//                 emp.performance = neg ? -val : val;
+//                 break;
+//             }
+//             case 6: // bonus_eligible
+//             {
+//                 int val = 0;
+//                 if (buffer[0] == '1')
+//                     val = 1;
+//                 emp.bonus_eligible = val;
+//                 break;
+//             }
+//             }
+//             field++;
+//         }
+//         else
+//         {
+//             if (bufIdx < 199)
+//                 buffer[bufIdx++] = line[i];
+//         }
+//         i++;
+//     }
+// }
 
 void loadEmployeesFromText(const char* filename)
 {
@@ -462,15 +439,22 @@ void loadEmployeesFromText(const char* filename)
     if (!fin)
         return;
 
-    char line[500];
-
-    while (employee_count < MAX_EMPLOYEES && fin.getline(line, 500))
+    while (employee_count < MAX_EMPLOYEES)
     {
-        if (line[0] == '\0')
-            continue;
-
         Employee& emp = employees_list[employee_count];
-        parseEmployeeLine(line, emp);
+
+        // order: id, name, dept, salary, attendance, performance, bonus
+        fin >> emp.emp_id
+            >> emp.emp_name
+            >> emp.dept_name
+            >> emp.salary
+            >> emp.attendance
+            >> emp.performance
+            >> emp.bonus_eligible;
+
+        if (fin.fail())
+            break;   // agar read fail hua (EOF ya koi issue) to loop se nikal jao
+
         employee_count++;
     }
 }
@@ -487,12 +471,12 @@ void saveEmployeesToText(const char* filename)
     for (int i = 0; i < employee_count; i++)
     {
         Employee& emp = employees_list[i];
-        fout << emp.emp_id      << '|'
-             << emp.emp_name    << '|'
-             << emp.dept_name   << '|'
-             << emp.salary      << '|'
-             << emp.attendance  << '|'
-             << emp.performance << '|'
+        fout << emp.emp_id      << ' '
+             << emp.emp_name    << ' '
+             << emp.dept_name   << ' '
+             << emp.salary      << ' '
+             << emp.attendance  << ' '
+             << emp.performance << ' '
              << emp.bonus_eligible << '\n';
     }
 }

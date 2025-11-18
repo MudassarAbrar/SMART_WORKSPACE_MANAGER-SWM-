@@ -20,17 +20,17 @@ static int findEmployeeIndex(int empId)
     return -1;  // not found
 }
 
-static bool stringsEqual(const char* a, const char* b)
-{
-    int idx = 0;
-    while (a[idx] != '\0' || b[idx] != '\0')
-    {
-        if (a[idx] != b[idx])
-            return false;
-        idx++;
-    }
-    return true;
-}
+// static bool stringsEqual(const char* a, const char* b)
+// {
+//     int idx = 0;
+//     while (a[idx] != '\0' || b[idx] != '\0')
+//     {
+//         if (a[idx] != b[idx])
+//             return false;
+//         idx++;
+//     }
+//     return true;
+// }
 
 // Safe copy for C-strings
 static void copyString(char* dest, const char* src, int destSize)
@@ -53,16 +53,7 @@ static bool stringEmpty(const char* text)
 // Helpers
 // ---------------------------------------------------------------------------
 
-// Department ka index name se dhoondhna
-static int findDepartmentIndexByName(const char dept_name[])
-{
-    for (int i = 0; i < department_count; i++)
-    {
-        if (stringsEqual(departments_list[i].dept_name, dept_name))
-            return i;
-    }
-    return -1;
-}
+
 
 // Ensure karo ke department ke emp_ids array mein enough capacity ho
 static void ensureDepartmentCapacity(int dept_index, int minCapacity)
@@ -363,7 +354,8 @@ void loadDepartmentsFromText(const char* filename)
 
     while (department_count < MAX_DEPARTMENTS)
     {
-        char tempDept[MAX_DEPT_NAME_LENGTH];
+        
+        char tempDept[30];
         int  employeeTotal = 0;
 
         fin >> tempDept >> employeeTotal;

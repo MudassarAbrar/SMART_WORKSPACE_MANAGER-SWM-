@@ -9,7 +9,7 @@ void handleDepartmentManagement();
 void handleMeetingManagement();
 
 // Ye chhota sa helper sirf int input safely lene ke liye hai
-static int readInt(const char* prompt)
+static int readInt(const char *prompt)
 {
     int value;
     cout << prompt;
@@ -200,8 +200,8 @@ void handleDepartmentManagement()
         {
             cout << "Enter Department Name to find top performer: ";
             cin.getline(deptName, 30);
-
-            int topId = findTopPerformer(deptName);
+            int deptIdx = findDepartmentIndexByName(deptName);
+                int topId = getBestEmployeeInDepartment(deptIdx);
             if (topId == -1)
                 cout << "No employees found or department missing.\n";
             else
@@ -268,7 +268,7 @@ void handleMeetingManagement()
         case 2:
         {
             int meetId = readInt("Enter meeting ID: ");
-            int empId  = readInt("Enter employee ID to add as participant: ");
+            int empId = readInt("Enter employee ID to add as participant: ");
 
             if (meetId >= 0 && empId >= 0)
             {

@@ -10,6 +10,8 @@
 const int MAX_EMPLOYEES   = 100;
 const int MAX_DEPARTMENTS = 20;
 const int MAX_MEETINGS    = 50;
+const int MAX_DEPT_NAME_LENGTH = 30;
+const int MAX_EMP_PER_DEPT = 20;
 
 // GLOBAL POINTERS AND COUNTERS (REAL STORAGE)
 
@@ -107,4 +109,33 @@ void freeMemory()
     employee_count   = 0;
     department_count = 0;
     meeting_count    = 0;
+}
+
+
+
+//global function prototypes
+// Department ka index name se dhoondhna
+
+
+// String compare: true agar dono same hain
+bool stringsEqual(const char* a, const char* b)
+{
+    int idx = 0;
+    while (a[idx] != '\0' || b[idx] != '\0')
+    {
+        if (a[idx] != b[idx])
+            return false;
+        idx++;
+    }
+    return true;
+}
+
+int findDepartmentIndexByName(const char dept_name[])
+{
+    for (int i = 0; i < department_count; i++)
+    {
+        if (stringsEqual(departments_list[i].dept_name, dept_name))
+            return i;
+    }
+    return -1;
 }

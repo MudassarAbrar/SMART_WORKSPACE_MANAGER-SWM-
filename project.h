@@ -40,6 +40,8 @@ struct Meeting
 extern const int MAX_EMPLOYEES;
 extern const int MAX_DEPARTMENTS;
 extern const int MAX_MEETINGS;
+extern const int MAX_EMP_PER_DEPT;
+extern const int MAX_DEPT_NAME_LENGTH;
 
 extern Employee*   employees_list;
 extern int         employee_count;
@@ -50,6 +52,12 @@ extern int         department_count;
 extern Meeting*    meetings_list;
 extern int         meeting_count;
 
+// global function prototypes
+// Department ka index name se dhoondhna
+extern int findDepartmentIndexByName(const char dept_name[]);
+
+// String compare: true agar dono same hain
+extern bool stringsEqual(const char* a, const char* b);
 
 // 1) Add a new employee (input function ke andar liya jaata hai)
 void addEmployee();
@@ -77,7 +85,7 @@ void addDepartment(char deptName[], int capacity);
 void removeDepartment(char deptName[]);
 
 // 9) Find the top performer ID in a given department.
-int findTopPerformer(char deptName[]);
+int getBestEmployeeInDepartment(int idx);
 
 // 10) Display all employees in a given department
 void displayDepartment(char deptName[]);
