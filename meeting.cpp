@@ -6,12 +6,8 @@ using namespace std;
 
 
 
-// static bool stringEmpty(const char *text)
-// {
-//     return text[0] == '\0';
-// }
 
-// Meeting ID se index find karna (global meetings_list mein)
+
 static int findMeetingIndex(int meet_id)
 {
     for (int i = 0; i < meeting_count; i++)
@@ -22,7 +18,6 @@ static int findMeetingIndex(int meet_id)
     return -1;
 }
 
-// Check karein ke employee exist karta hai ya nahi
 static bool employeeExists(int emp_id)
 {
     for (int i = 0; i < employee_count; i++)
@@ -32,7 +27,7 @@ static bool employeeExists(int emp_id)
     }
     return false;
 }
-// changed
+
 static bool validateDate(const char *date)
 {
     int len = 0;
@@ -47,7 +42,7 @@ static bool validateDate(const char *date)
 
     return true;
 }
-// changed
+
 static bool validateTime(const char *time)
 {
     int len = 0;
@@ -71,7 +66,7 @@ static bool collectMeetingDetails(Meeting &slot)
     
     if (cin.fail())
     {
-        // Jab tak tum cin.clear() nahi karte cin kisi bhi new input ko process nahi karega
+        
         cin.clear();
         cin.ignore(1000, '\n');
         cout << "Invalid meeting ID.\n";
@@ -81,7 +76,6 @@ static bool collectMeetingDetails(Meeting &slot)
     if (findMeetingIndex(slot.meet_id) != -1)
     {
         cout << "Meeting ID already exists.\n";
-        // cin.ignore(1000, '\n');
         return false;
     }
 
@@ -118,12 +112,10 @@ static bool collectMeetingDetails(Meeting &slot)
     return true;
 }
 
-// Agar same date + same time wali koi meeting already hai to clash ho jayega
 static bool clashesWithExisting(const Meeting &candidate)
 {
     for (int i = 0; i < meeting_count; i++)
     {
-        // time or date ki base pr yeh clash check krey ga
         if (stringsEqual(meetings_list[i].meet_date, candidate.meet_date) &&
             stringsEqual(meetings_list[i].meet_time, candidate.meet_time))
 
@@ -163,32 +155,6 @@ void addMeeting()
     cout << "Meeting added.\n";
 }
 
-// int scheduleMeeting()
-// {
-//     // Ye function ab logically same hai, bas aap menu mein use nahi kar rahe ho
-//     if (meeting_count >= MAX_MEETINGS)
-//     {
-//         cout << "Meeting list is full.\n";
-//         return 0;
-//     }
-
-//     Meeting temp;
-//     if (!collectMeetingDetails(temp))
-//         return 0;
-
-//     if (clashesWithExisting(temp))
-//     {
-//         cout << "Meeting clash detected. Could not schedule.\n";
-//         return 0;
-//     }
-
-//     temp.participant_ids = new int[temp.participant_capacity];
-//     meetings_list[meeting_count] = temp;
-//     meeting_count++;
-
-//     cout << "Meeting scheduled successfully.\n";
-//     return 1;
-// }
 
 void displayMeeting(int index)
 {
@@ -249,51 +215,19 @@ void addParticipant(int meetIdx, int empId)
 
     m.participant_ids[m.participant_count++] = empId;
     cout << "Participant added.\n";
-    // // Agar capacity full hai to double kar do
-    // if (m.participant_count >= m.participant_capacity)
-    // {
-    //     int newCapacity = m.participant_capacity * 2;
-    //     // if (newCapacity < 10)
-    //     //     newCapacity = 10;
 
-    //     int* newArray = new int[newCapacity];
-    //     for (int i = 0; i < m.participant_count; i++)
-    //         newArray[i] = m.participant_ids[i];
-
-    //     delete[] m.participant_ids;
-    //     m.participant_ids   = newArray;
-    //     m.participant_capacity = newCapacity;
-    // }
 
    
 }
 
-// int hasTimeClash(int indexA, int indexB)
-// {
-//     if (indexA < 0 || indexA >= meeting_count)
-//         return 0;
-//     if (indexB < 0 || indexB >= meeting_count)
-//         return 0;
-
-//     Meeting& a = meetings_list[indexA];
-//     Meeting& b = meetings_list[indexB];
-
-//     if (stringsEqual(a.meet_date, b.meet_date) &&
-//         stringsEqual(a.meet_time, b.meet_time))
-//         return 1;
-
-//     return 0;
-// }
-
 // ---------------------------------------------------------------------------
 // File handling (text)
-// Format: id topic date time count ids...
 // ---------------------------------------------------------------------------
 void loadMeetingsFromText(const char *filename)
 {
     ifstream fin(filename);
 
-    // Purane meetings ke participant arrays free kar do
+    // Purane meetings ke participant arrays free kar rhey hn
     for (int i = 0; i < meeting_count; i++)
     {
         delete[] meetings_list[i].participant_ids;
@@ -328,9 +262,6 @@ void loadMeetingsFromText(const char *filename)
         slot.participant_capacity = (slot.participant_count > 0)
                                     ? slot.participant_count
                                     : 10;
-
-        // if (slot.participant_ids != nullptr)
-        //     delete[] slot.participant_ids;
 
         slot.participant_ids = new int[slot.participant_capacity];
 

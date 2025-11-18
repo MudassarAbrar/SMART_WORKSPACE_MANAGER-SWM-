@@ -2,9 +2,7 @@
 
 #include <iostream>
 
-// Thora sa simple structs bana diye hain employees, departments, meetings ke liye.
-// Inko hum pure project mein use kar rahe hain.
-
+// STRUCTS
 struct Employee
 {
     int   emp_id;
@@ -13,7 +11,7 @@ struct Employee
     double salary;
     int   attendance;
     double performance;
-    int   bonus_eligible;   // 1 matlab haan, 0 matlab nahin
+    int   bonus_eligible;   
 };
 
 struct Department
@@ -28,14 +26,14 @@ struct Meeting
 {
     int   meet_id;
     char  meet_topic[50];
-    char  meet_date[11];   // "YYYY-MM-DD"
-    char  meet_time[6];    // "HH:MM"
+    char  meet_date[11];   // "YYYY-MM-DD" FORMAT SIRF YHI RHEY GA
+    char  meet_time[6];    // "HH:MM" FORMAT SIRF YHI RHEY GA
     int   participant_count;
     int   participant_capacity;
-    int*  participant_ids; // yahan sirf employee IDs rakh rahe hain
+    int*  participant_ids; 
 };
 
-// GLOBALS (DECLARATIONS ONLY) – asli definitions global.cpp mein hain
+// GLOBALS (DECLARATIONS ONLY) definitions global.cpp mein hain
 
 extern const int MAX_EMPLOYEES;
 extern const int MAX_DEPARTMENTS;
@@ -53,18 +51,13 @@ extern Meeting*    meetings_list;
 extern int         meeting_count;
 
 // global function prototypes
-// Department ka index name se dhoondhna
 extern int findDepartmentIndexByName(const char dept_name[]);
 extern void copyString(char* dest, const char* src, int destSize);
 extern bool stringEmpty(const char* text);
 extern int findEmployeeIndex(int empId);
-
-
-
-// String compare: true agar dono same hain
 extern bool stringsEqual(const char* a, const char* b);
 
-// 1) Add a new employee (input function ke andar liya jaata hai)
+// 1) Add a new employee 
 void addEmployee();
 
 // 2) Remove an employee by ID
@@ -77,7 +70,6 @@ void markAttendance(int emp_id);
 void updatePerformance(int emp_id, double score);
 
 // 5) Calculate bonus eligibility for a specific employee ID
-//    Example logic: performance > 90 and attendance > 85
 void calculateBonus(int emp_id);
 
 // 6) Display full details for one employee by ID
@@ -101,27 +93,21 @@ double getDeptAvgPerformance(const char* deptName);
 // 12) Display department capacity information
 void displayDeptCapacity(char deptName[]);
 
-// 13) Add a new meeting (topic/date/time input yahi lete hain)
+// 13) Add a new meeting 
 void addMeeting();
 
-// 14) Schedule a meeting (ensure no time clash). Returns 1 on success.
-int scheduleMeeting();
-
-// 15) Display details of a meeting at a given index
+// 14) Display details of a meeting 
 void displayMeeting(int index);
 
-// 16) Add a participant (employee ID) to a meeting by index
+// 16) Add a participant (employee ID) to a meeting 
 void addParticipant(int meetIdx, int empId);
 
-// 17) Check if two meetings clash in date/time.
-//     Return 1 if there is a clash, 0 otherwise.
-int hasTimeClash(int indexA, int indexB);
 
-// Allocate dynamic arrays for employees, departments, meetings
-// Aur unke inner pointers ko bhi initialize kar dete hain
+
+// Allocate dynamic arrays for employees, departments, meetings for whole program
 void initializeMemory();
 
-// Free all dynamic memory (employees, departments, meetings and their inner arrays)
+// Free all dynamic memory 
 void freeMemory();
 
 

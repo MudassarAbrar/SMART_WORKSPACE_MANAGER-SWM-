@@ -1,7 +1,3 @@
-// global.cpp
-// Yahan pe saare global arrays / counts ka real memory allocate ho raha hai.
-// Sir ne dynamic memory must bola tha, is liye new [] use kar rahe hain.
-
 #include "project.h"
 
 // CONSTANT LIMITS (REAL DEFINITIONS)
@@ -13,10 +9,9 @@ const int MAX_MEETINGS    = 50;
 const int MAX_DEPT_NAME_LENGTH = 30;
 const int MAX_EMP_PER_DEPT = 20;
 
-// GLOBAL POINTERS AND COUNTERS (REAL STORAGE)
-
+// GLOBAL POINTERS 
 // Employee data for the whole program
-// Dhyaan: yeh pointers ko ham initializeMemory() mein allocate karte hain.
+// yeh pointers ko ham initializeMemory() mein allocate karte hain.
 Employee* employees_list      = nullptr;
 int       employee_count      = 0;
 
@@ -39,7 +34,7 @@ void initializeMemory()
     department_count = 0;
     meeting_count    = 0;
 
-    // Har department ke andar jo emp_ids pointer hai usko initialize kar rahe hain
+    
     for (int i = 0; i < MAX_DEPARTMENTS; i++)
     {
         departments_list[i].emp_ids      = nullptr;
@@ -48,7 +43,7 @@ void initializeMemory()
         departments_list[i].dept_name[0] = '\0';
     }
 
-    // Meetings ke inner pointers bhi reset kar rahe hain
+    
     for (int i = 0; i < MAX_MEETINGS; i++)
     {
         meetings_list[i].participant_ids      = nullptr;
@@ -72,7 +67,6 @@ void initializeMemory()
 
 void freeMemory()
 {
-    // Pehle departments ke inner arrays free karo
     for (int i = 0; i < department_count; i++)
     {
         if (departments_list[i].emp_ids != nullptr)
@@ -84,7 +78,6 @@ void freeMemory()
         }
     }
 
-    // Meetings ke inner participant arrays free karo
     for (int i = 0; i < meeting_count; i++)
     {
         if (meetings_list[i].participant_ids != nullptr)
@@ -98,24 +91,15 @@ void freeMemory()
 
      if (employees_list != nullptr)
     {
-        // for (int i = 0; i < employee_count; i++)
-        // {
-        //     employees_list[i].emp_id = -1;
-        //     employees_list[i].emp_name[0] = '\0';
-        //     employees_list[i].dept_name[0] = '\0';
-        //     employees_list[i].salary = 0.0;
-        //     employees_list[i].attendance = 0;
-        //     employees_list[i].performance = 0.0;
-        //     employees_list[i].bonus_eligible = false;
-        // }
+
 
         delete[] employees_list;
         employees_list = nullptr;
     }
 
 
-    // Ab main arrays free karte hain
-    if (employees_list != nullptr)
+    
+  if (employees_list != nullptr)
     {
         delete[] employees_list;
         employees_list = nullptr;
@@ -133,7 +117,7 @@ void freeMemory()
         meetings_list = nullptr;
     }
 
-    // Counts reset kar do, taake koi garbage na rahe
+    // Counts reset kar rhey hn, taake koi garbage na rahe
     employee_count   = 0;
     department_count = 0;
     meeting_count    = 0;
@@ -141,9 +125,7 @@ void freeMemory()
 
 
 
-//global function prototypes
-// Department ka index name se dhoondhna
-
+//global function jo almost hr file mein chahiye hn
 
 // String compare: true agar dono same hain
 bool stringsEqual(const char* a, const char* b)
@@ -168,7 +150,7 @@ int findDepartmentIndexByName(const char dept_name[])
     return -1;
 }
 
-// Simple helper to copy C-style string safely
+// Safe copy ho rhi h 
 void copyString(char* dest, const char* src, int destSize)
 {
     if (destSize <= 0)

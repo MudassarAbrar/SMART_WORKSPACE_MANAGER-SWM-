@@ -1,62 +1,10 @@
 #include "project.h"
 #include <iostream>
 #include <fstream>
-#include <cstring> // Fix: Include <cstring> for strcpy
+#include <cstring>
 
 using namespace std;
-//To avoid duplicate symbols during linking, helpers are kept file-private using static.
-//So marking them static means:
 
-// Only this file can use them
-//Other files cannot accidentally access or redefine them
-//Encapsulation is maintained
-// Simple string compare function
-// static int findEmployeeIndex(int empId)
-// {
-//     for (int i = 0; i < employee_count; i++)
-//     {
-//         if (employees_list[i].emp_id == empId)
-//             return i;
-//     }
-//     return -1;  // not found
-// }
-
-// static bool stringsEqual(const char* a, const char* b)
-// {
-//     int idx = 0;
-//     while (a[idx] != '\0' || b[idx] != '\0')
-//     {
-//         if (a[idx] != b[idx])
-//             return false;
-//         idx++;
-//     }
-//     return true;
-// }
-
-// Safe copy for C-strings
-// static void copyString(char* dest, const char* src, int destSize)
-// {
-//     int i = 0;
-//     while (i < destSize - 1 && src[i] != '\0')
-//     {
-//         dest[i] = src[i];
-//         i++;
-//     }
-//     dest[i] = '\0';
-// }
-
-// static bool stringEmpty(const char* text)
-// {
-//     return text[0] == '\0';
-// }
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-
-
-// Ensure karo ke department ke emp_ids array mein enough capacity ho
 static void ensureDepartmentCapacity(int dept_index, int minCapacity)
 {
     if (dept_index < 0 || dept_index >= department_count)
@@ -68,8 +16,7 @@ static void ensureDepartmentCapacity(int dept_index, int minCapacity)
     int newCapacity = departments_list[dept_index].emp_capacity * 2;
     if (newCapacity < minCapacity)
         newCapacity = minCapacity;
-    // if (newCapacity < 10)
-    //     newCapacity = 10;
+   
 
     int* newArray = new int[newCapacity];
     for (int i = 0; i < departments_list[dept_index].emp_count; i++)
@@ -113,13 +60,13 @@ void addDepartment(char deptName[], int capacity)
         return;
     }
 
-    // Add the new department
+    //reference object
     Department& slot = departments_list[department_count];
-    strcpy(slot.dept_name, deptName); // Fix: Use dept_name instead of name
-    slot.emp_capacity = capacity;    // Fix: Use emp_capacity instead of capacity
+    strcpy(slot.dept_name, deptName); 
+    slot.emp_capacity = capacity;    
     slot.emp_count = 0;
 
-    // Dynamically allocate the emp_ids array
+   
     slot.emp_ids = new int[slot.emp_capacity];
 
     department_count++;
@@ -136,11 +83,10 @@ void removeDepartment(char deptName[])
         return;
     }
 
-    // Pehle department ke dynamic IDs array ko free kar do
+    
     if (departments_list[idx].emp_ids != nullptr)
         delete[] departments_list[idx].emp_ids;
 
-    // Array se shift kar ke remove karna
     for (int i = idx; i < department_count - 1; i++)
         departments_list[i] = departments_list[i + 1];
 
@@ -157,24 +103,20 @@ void removeDepartment(char deptName[])
 
 int getBestEmployeeInDepartment(int idx)
 {
-    // Invalid department index
     if (idx < 0 || idx >= department_count)
         return -1;
 
-    // If department has no employees
     if (departments_list[idx].emp_count == 0)
         return -1;
 
-    double bestScore = -1e18;   // very small number
+    double bestScore = -1e18;   
     int    bestId    = -1;
     bool   anyValid  = false;
 
-    // Loop through employee IDs stored in this department
     for (int i = 0; i < departments_list[idx].emp_count; i++)
     {
         int empId = departments_list[idx].emp_ids[i];
 
-        // Find this employee in global employee list
         int pos = findEmployeeIndex(empId);
 
         if (pos == -1)
@@ -315,7 +257,7 @@ double getDeptAvgPerformance(const char *deptName)
         int empId = departments_list[deptIdx].emp_ids[i];
         int empIdx = findEmployeeIndex(empId);
 
-        if (empIdx != -1) // Validate employee ID
+        if (empIdx != -1) 
         {
             totalPerformance += employees_list[empIdx].performance;
             validEmployees++;
@@ -323,7 +265,7 @@ double getDeptAvgPerformance(const char *deptName)
     }
 
     if (validEmployees == 0)
-        return -1; // No valid employees found
+        return -1; 
 
     return totalPerformance / validEmployees;
 }
@@ -331,13 +273,6 @@ double getDeptAvgPerformance(const char *deptName)
 
 
 
-
-
-// ---------------------------------------------------------------------------
-// File handling for departments (text)
-// Format per line:
-// <department_name> <employee_count> <emp_id_1> <emp_id_2> ...
-// ---------------------------------------------------------------------------
 void loadDepartmentsFromText(const char* filename)
 {
     ifstream fin(filename);
@@ -366,7 +301,7 @@ void loadDepartmentsFromText(const char* filename)
         if (fin.fail())
             break;
 
-        // Use simple indexing instead of reference
+        
         copyString(departments_list[department_count].dept_name, tempDept, MAX_DEPT_NAME_LENGTH);
         departments_list[department_count].emp_count    = employeeTotal;
         departments_list[department_count].emp_capacity = (employeeTotal > MAX_EMPLOYEES) ? MAX_EMPLOYEES : employeeTotal;
@@ -396,7 +331,7 @@ void saveDepartmentsToText(const char* filename)
     }
 
     for (int i = 0; i < department_count; i++)
-    {//REFERENCE OBJ TO THE DEPARTMENT AT i
+    {
         Department& d = departments_list[i];
         fout << d.dept_name << ' ' << d.emp_count;
         for (int j = 0; j < d.emp_count; j++)

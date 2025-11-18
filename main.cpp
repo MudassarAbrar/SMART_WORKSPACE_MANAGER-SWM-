@@ -303,7 +303,7 @@ void handleMeetingManagement()
                     }
                 }
                 // Agar meeting nahi milti, meetIdx -1 rahega, function handle karega
-               // Ensure meetIdx is valid before calling addParticipant
+                // Ensure meetIdx is valid before calling addParticipant
                 if (meetIdx != -1)
                 {
                     addParticipant(meetIdx, empId);
@@ -363,18 +363,18 @@ void handleMeetingManagement()
 
 int main()
 {
-    // Sabse pehle dynamic memory allocate karwa lete hain
+    // Sabse pehle dynamic memory allocate karwa rhey hain
     initializeMemory();
 
-    // File se data load karo (agar files existing hain to)
+    // File se data load ho rha h (agar files existing hain to)
     loadDepartmentsFromText("departments.txt");
 
     loadEmployeesFromText("employee.txt");
-   
+
     loadMeetingsFromText("meetings.txt");
 
     cout << "============================================\n";
-    cout << "      SMART WORKSPACE MANAGER \n";
+    cout << "         SMART WORKSPACE MANAGER \n";
     cout << "============================================\n";
 
     bool running = true;
@@ -419,12 +419,12 @@ int main()
         cout << '\n';
     }
 
-    // Program band hone se pehle data save karwa lo
+    // Program band hone se pehle data save karwa rhe hn for later use
     saveEmployeesToText("employee.txt");
     saveDepartmentsToText("departments.txt");
     saveMeetingsToText("meetings.txt");
 
-    // Saari dynamic memory free
+    // Saari dynamic memory free krdi h
     freeMemory();
 
     return 0;
