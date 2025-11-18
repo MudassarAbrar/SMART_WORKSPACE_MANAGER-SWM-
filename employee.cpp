@@ -4,19 +4,22 @@
 
 using namespace std;
 
-static void copyString(char* destination, const char* source, int destinationSize)
+// Simple helper to copy C-style string safely
+static void copyString(char* dest, const char* src, int destSize)
 {
-    if (destinationSize <= 0)
+    if (destSize <= 0)
         return;
+
     int i = 0;
-    while (i < destinationSize - 1 && source[i] != '\0')
+    while (i < destSize - 1 && src[i] != '\0')
     {
-        destination[i] = source[i];
+        dest[i] = src[i];
         i++;
     }
-    destination[i] = '\0';
+    dest[i] = '\0';
 }
 
+// String compare: true agar dono same hain
 static bool stringsEqual(const char* a, const char* b)
 {
     int idx = 0;
@@ -37,6 +40,8 @@ static bool stringEmpty(const char* text)
 // ---------------------------------------------------------------------------
 // Lookups & validations
 // ---------------------------------------------------------------------------
+
+// Employee list mein given ID ka index dhoondta hai
 static int findEmployeeIndex(int emp_id)
 {
     for (int i = 0; i < employee_count; i++)
@@ -47,6 +52,7 @@ static int findEmployeeIndex(int emp_id)
     return -1;
 }
 
+// Department ka index name se dhoondna
 static int findDepartmentIndex(const char* dept_name)
 {
     for (int i = 0; i < department_count; i++)
@@ -57,6 +63,7 @@ static int findDepartmentIndex(const char* dept_name)
     return -1;
 }
 
+// Agar department ke andar capacity kam ho, to resize kar do
 static void ensureDepartmentCapacity(int dept_index, int minCapacity)
 {
     if (dept_index < 0 || dept_index >= department_count)
@@ -80,16 +87,18 @@ static void ensureDepartmentCapacity(int dept_index, int minCapacity)
     departments_list[dept_index].emp_capacity = newCapacity;
 }
 
+// Employee ko department ke emp_ids array mein add karna
 static void addEmployeeToDepartment(int emp_id, const char* dept_name)
 {
     int dept_index = findDepartmentIndex(dept_name);
     if (dept_index == -1)
     {
-        cout << "Warning: Department \"" << dept_name << "\" not found. Employee stored without department link.\n";
+        cout << "Warning: Department \"" << dept_name
+             << "\" not found. Employee stored without department link.\n";
         return;
     }
 
-    // prevent duplicates
+    // duplicate employee ID mat add karo
     for (int i = 0; i < departments_list[dept_index].emp_count; i++)
     {
         if (departments_list[dept_index].emp_ids[i] == emp_id)
@@ -100,6 +109,7 @@ static void addEmployeeToDepartment(int emp_id, const char* dept_name)
     departments_list[dept_index].emp_ids[departments_list[dept_index].emp_count++] = emp_id;
 }
 
+// Department se employee ID remove karna (agar exist karta ho)
 static void removeEmployeeFromDepartment(int emp_id, const char* dept_name)
 {
     int dept_index = findDepartmentIndex(dept_name);
@@ -110,8 +120,10 @@ static void removeEmployeeFromDepartment(int emp_id, const char* dept_name)
     {
         if (departments_list[dept_index].emp_ids[i] == emp_id)
         {
+            // simple left shift technique
             for (int j = i; j < departments_list[dept_index].emp_count - 1; j++)
                 departments_list[dept_index].emp_ids[j] = departments_list[dept_index].emp_ids[j + 1];
+
             departments_list[dept_index].emp_count--;
             return;
         }
@@ -130,6 +142,7 @@ void addEmployee()
     }
 
     Employee record;
+
     cout << "Enter Employee ID: ";
     cin >> record.emp_id;
     if (cin.fail())
@@ -139,6 +152,7 @@ void addEmployee()
         cout << "Invalid ID entered.\n";
         return;
     }
+
     if (findEmployeeIndex(record.emp_id) != -1)
     {
         cout << "Employee ID already exists.\n";
@@ -147,6 +161,7 @@ void addEmployee()
     }
 
     cin.ignore(1000, '\n');
+
     cout << "Enter Name: ";
     cin.getline(record.emp_name, 50);
     if (stringEmpty(record.emp_name))
@@ -174,12 +189,14 @@ void addEmployee()
     }
     cin.ignore(1000, '\n');
 
-    record.attendance = 0;
-    record.performance = 0;
-    record.bonus_eligible = 0;
+    // default values jab naya employee add ho
+    record.attendance      = 0;
+    record.performance     = 0;
+    record.bonus_eligible  = 0;
 
     employees_list[employee_count++] = record;
     addEmployeeToDepartment(record.emp_id, record.dept_name);
+
     cout << "Employee added successfully.\n";
 }
 
@@ -192,10 +209,13 @@ void removeEmployee(int emp_id)
         return;
     }
 
+    // Department mapping se bhi hata do
     removeEmployeeFromDepartment(emp_id, employees_list[idx].dept_name);
 
+    // Employee array mein se remove (shift)
     for (int i = idx; i < employee_count - 1; i++)
         employees_list[i] = employees_list[i + 1];
+
     employee_count--;
 
     cout << "Employee removed successfully.\n";
@@ -207,8 +227,8 @@ void markAttendance(int emp_id)
     if (idx == -1)
     {
         cout << "Employee not found.\n";
-            return;
-        }
+        return;
+    }
 
     int newAttendance;
     cout << "Enter new attendance (0 - 365): ";
@@ -232,8 +252,9 @@ void updatePerformance(int emp_id, double score)
     if (idx == -1)
     {
         cout << "Employee not found.\n";
-            return;
-        }
+        return;
+    }
+
     if (score < 0 || score > 100)
     {
         cout << "Score must be between 0 and 100.\n";
@@ -250,9 +271,10 @@ void calculateBonus(int emp_id)
     if (idx == -1)
     {
         cout << "Employee not found.\n";
-            return;
-        }
+        return;
+    }
 
+    // Simple rule: high performance + good attendance = bonus
     if (employees_list[idx].performance > 90 && employees_list[idx].attendance > 85)
         employees_list[idx].bonus_eligible = 1;
     else
@@ -271,6 +293,7 @@ void displayEmployee(int emp_id)
     }
 
     Employee& record = employees_list[idx];
+
     cout << "ID: " << record.emp_id << '\n';
     cout << "Name: " << record.emp_name << '\n';
     cout << "Department: " << record.dept_name << '\n';
@@ -282,14 +305,17 @@ void displayEmployee(int emp_id)
 
 // ---------------------------------------------------------------------------
 // File Handling – Employees (text format)
-// Format per line: emp_id|emp_name|dept_name|salary|attendance|performance|bonus_eligible
+// Format per line:
+// emp_id|emp_name|dept_name|salary|attendance|performance|bonus_eligible
 // ---------------------------------------------------------------------------
+
+// Simple manual parser, taake external libraries use na karni pade
 static void parseEmployeeLine(const char* line, Employee& emp)
 {
-    int i = 0;
-    int field = 0;
+    int  i      = 0;
+    int  field  = 0;
     char buffer[200];
-    int bufIdx = 0;
+    int  bufIdx = 0;
 
     while (line[i] != '\0' && field < 7)
     {
@@ -303,7 +329,7 @@ static void parseEmployeeLine(const char* line, Employee& emp)
             case 0: // emp_id
             {
                 int val = 0;
-                int j = 0;
+                int j   = 0;
                 while (buffer[j] != '\0')
                 {
                     if (buffer[j] >= '0' && buffer[j] <= '9')
@@ -322,15 +348,18 @@ static void parseEmployeeLine(const char* line, Employee& emp)
             case 3: // salary
             {
                 double val = 0.0;
-                int j = 0;
-                bool neg = false;
+                int    j   = 0;
+                bool   neg = false;
+
                 if (buffer[0] == '-')
                 {
                     neg = true;
-                    j = 1;
+                    j   = 1;
                 }
-                bool afterDot = false;
-                double divisor = 1.0;
+
+                bool   afterDot = false;
+                double divisor  = 1.0;
+
                 while (buffer[j] != '\0')
                 {
                     if (buffer[j] == '.')
@@ -342,7 +371,7 @@ static void parseEmployeeLine(const char* line, Employee& emp)
                         if (afterDot)
                         {
                             divisor *= 10.0;
-                            val = val + (buffer[j] - '0') / divisor;
+                            val     = val + (buffer[j] - '0') / divisor;
                         }
                         else
                         {
@@ -357,7 +386,7 @@ static void parseEmployeeLine(const char* line, Employee& emp)
             case 4: // attendance
             {
                 int val = 0;
-                int j = 0;
+                int j   = 0;
                 while (buffer[j] != '\0')
                 {
                     if (buffer[j] >= '0' && buffer[j] <= '9')
@@ -370,15 +399,18 @@ static void parseEmployeeLine(const char* line, Employee& emp)
             case 5: // performance
             {
                 double val = 0.0;
-                int j = 0;
-                bool neg = false;
+                int    j   = 0;
+                bool   neg = false;
+
                 if (buffer[0] == '-')
                 {
                     neg = true;
-                    j = 1;
+                    j   = 1;
                 }
-                bool afterDot = false;
-                double divisor = 1.0;
+
+                bool   afterDot = false;
+                double divisor  = 1.0;
+
                 while (buffer[j] != '\0')
                 {
                     if (buffer[j] == '.')
@@ -390,7 +422,7 @@ static void parseEmployeeLine(const char* line, Employee& emp)
                         if (afterDot)
                         {
                             divisor *= 10.0;
-                            val = val + (buffer[j] - '0') / divisor;
+                            val     = val + (buffer[j] - '0') / divisor;
                         }
                         else
                         {
@@ -431,6 +463,7 @@ void loadEmployeesFromText(const char* filename)
         return;
 
     char line[500];
+
     while (employee_count < MAX_EMPLOYEES && fin.getline(line, 500))
     {
         if (line[0] == '\0')
@@ -454,8 +487,12 @@ void saveEmployeesToText(const char* filename)
     for (int i = 0; i < employee_count; i++)
     {
         Employee& emp = employees_list[i];
-        fout << emp.emp_id << '|' << emp.emp_name << '|' << emp.dept_name << '|'
-             << emp.salary << '|' << emp.attendance << '|' << emp.performance << '|'
+        fout << emp.emp_id      << '|'
+             << emp.emp_name    << '|'
+             << emp.dept_name   << '|'
+             << emp.salary      << '|'
+             << emp.attendance  << '|'
+             << emp.performance << '|'
              << emp.bonus_eligible << '\n';
     }
 }

@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+// Thora sa simple structs bana diye hain employees, departments, meetings ke liye.
+// Inko hum pure project mein use kar rahe hain.
+
 struct Employee
 {
     int   emp_id;
@@ -10,15 +13,15 @@ struct Employee
     double salary;
     int   attendance;
     double performance;
-    int   bonus_eligible;
+    int   bonus_eligible;   // 1 matlab haan, 0 matlab nahin
 };
 
 struct Department
 {
     char  dept_name[30];
-    int   emp_count;
-    int   emp_capacity;
-    int*  emp_ids;
+    int   emp_count;        // kitne employees iss department mein hain
+    int   emp_capacity;     // max kitne rakh sakte hain
+    int*  emp_ids;          // yahan sirf unke IDs store ho rahe hain
 };
 
 struct Meeting
@@ -29,10 +32,10 @@ struct Meeting
     char  meet_time[6];    // "HH:MM"
     int   participant_count;
     int   participant_capacity;
-    int*  participant_ids;
+    int*  participant_ids; // yahan sirf employee IDs rakh rahe hain
 };
 
-// GLOBALS (DECLARATIONS ONLY)
+// GLOBALS (DECLARATIONS ONLY) – asli definitions global.cpp mein hain
 
 extern const int MAX_EMPLOYEES;
 extern const int MAX_DEPARTMENTS;
@@ -48,7 +51,7 @@ extern Meeting*    meetings_list;
 extern int         meeting_count;
 
 
-// 1) Add a new employee (take input inside the function)
+// 1) Add a new employee (input function ke andar liya jaata hai)
 void addEmployee();
 
 // 2) Remove an employee by ID
@@ -61,7 +64,7 @@ void markAttendance(int emp_id);
 void updatePerformance(int emp_id, double score);
 
 // 5) Calculate bonus eligibility for a specific employee ID
-//    (e.g. performance > 90 and attendance > 85)
+//    Example logic: performance > 90 and attendance > 85
 void calculateBonus(int emp_id);
 
 // 6) Display full details for one employee by ID
@@ -85,24 +88,24 @@ double getDeptAvgPerformance(char deptName[]);
 // 12) Display department capacity information
 void displayDeptCapacity(char deptName[]);
 
-// 12) Add a new meeting (take topic/date/time as input inside)
+// 13) Add a new meeting (topic/date/time input yahi lete hain)
 void addMeeting();
 
-// 13) Schedule a meeting (take info, ensure no time clash). Returns 1 on success.
+// 14) Schedule a meeting (ensure no time clash). Returns 1 on success.
 int scheduleMeeting();
 
-// 14) Display details of a meeting at a given index
+// 15) Display details of a meeting at a given index
 void displayMeeting(int index);
 
-// 15) Add a participant (employee ID) to a meeting by index
+// 16) Add a participant (employee ID) to a meeting by index
 void addParticipant(int meetIdx, int empId);
 
-// 16) Check if two meetings clash in date/time.
+// 17) Check if two meetings clash in date/time.
 //     Return 1 if there is a clash, 0 otherwise.
 int hasTimeClash(int indexA, int indexB);
 
 // Allocate dynamic arrays for employees, departments, meetings
-// and also initialize inner dynamic arrays for departments/meetings when needed.
+// Aur unke inner pointers ko bhi initialize kar dete hain
 void initializeMemory();
 
 // Free all dynamic memory (employees, departments, meetings and their inner arrays)
@@ -122,5 +125,3 @@ void saveDepartmentsToText(const char* filename);
 // Meetings -> TEXT file
 void loadMeetingsFromText(const char* filename);
 void saveMeetingsToText(const char* filename);
-
-
