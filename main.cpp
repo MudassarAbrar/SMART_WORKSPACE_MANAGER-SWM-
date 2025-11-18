@@ -211,9 +211,22 @@ void handleDepartmentManagement()
         }
 
         case 5:
+             
             cout << "Enter Department Name to get average performance: ";
             cin.getline(deptName, 30);
-            cout << "Average performance: " << getDeptAvgPerformance(deptName) << '\n';
+            int deptIdx = findDepartmentIndexByName(deptName);
+            if (deptIdx == -1)
+            {
+                cout << "Department not found.\n";
+            }
+            else
+            {
+                double avgPerformance = getDeptAvgPerformance(deptName);
+                if (avgPerformance == -1)
+                    cout << "No employees found in the department.\n";
+                else
+                    cout << "Average performance: " << avgPerformance << '\n';
+            }
             break;
 
         case 6:
@@ -283,7 +296,19 @@ void handleMeetingManagement()
                     }
                 }
                 // Agar meeting nahi milti, meetIdx -1 rahega, function handle karega
-                addParticipant(meetIdx, empId);
+               // Ensure meetIdx is valid before calling addParticipant
+                if (meetIdx != -1)
+                {
+                    addParticipant(meetIdx, empId);
+                }
+                else
+                {
+                    cout << "Meeting not found.\n";
+                }
+            }
+            else
+            {
+                cout << "Invalid meeting ID or employee ID.\n";
             }
             break;
         }
@@ -302,7 +327,18 @@ void handleMeetingManagement()
                         break;
                     }
                 }
-                displayMeeting(meetIdx);
+                if (meetIdx != -1)
+                {
+                    displayMeeting(meetIdx);
+                }
+                else
+                {
+                    cout << "Meeting not found.\n";
+                }
+            }
+            else
+            {
+                cout << "Invalid meeting ID.\n";
             }
             break;
         }

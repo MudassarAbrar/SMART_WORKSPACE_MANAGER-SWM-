@@ -96,7 +96,7 @@ static void removeEmployeeFromDepartment(int emp_id, const char* dept_name)
 // ---------------------------------------------------------------------------
 void addEmployee()
 {
-    if (employee_count >= MAX_EMPLOYEES)
+    if (employee_count >= MAX_EMP_PER_DEPT)
     {
         cout << "Employee list is full. Cannot add more employees.\n";
         return;
@@ -438,7 +438,19 @@ void loadEmployeesFromText(const char* filename)
         if (fin.fail())
             break;   // agar read fail hua (EOF ya koi issue) to loop se nikal jao
 
-        employee_count++;
+       // Check if the department exists
+        if (findDepartmentIndexByName(emp.dept_name) == -1)
+        {
+            cout << "Warning: Department \"" << emp.dept_name
+                 << "\" not found. Skipping employee ID " << emp.emp_id << ".\n";
+            continue; // Skip this employee
+        }
+
+        // Add the employee to the list
+        employees_list[employee_count++] = emp;
+
+        // Add the employee to the department
+        addEmployeeToDepartment(emp.emp_id, emp.dept_name);
     }
 }
 

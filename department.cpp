@@ -86,7 +86,7 @@ static void ensureDepartmentCapacity(int dept_index, int minCapacity)
 // ---------------------------------------------------------------------------
 void addDepartment(char deptName[], int capacity)
 {
-    if (department_count >= MAX_DEPARTMENTS)
+    if (department_count >= MAX_EMP_PER_DEPT)
     {
         cout << "Department list is full.\n";
         return;
@@ -114,12 +114,12 @@ void addDepartment(char deptName[], int capacity)
         return;
     }
 
-    Department& slot = departments_list[department_count];
-    copyString(slot.dept_name, deptName, MAX_DEPT_NAME_LENGTH );
-    slot.emp_count    = 0;
-    slot.emp_capacity = capacity;
-    slot.emp_ids      = new int[slot.emp_capacity];
-
+       // Add the new department
+    strcpy(departments_list[department_count].name, deptName);
+    departments_list[department_count].capacity = capacity;
+    departments_list[department_count].emp_count = 0;
+    departments_list[department_count].emp_ids = new int[capacity];
+  
     department_count++;
 
     cout << "Department "<<deptName<<" added with capacity: " << capacity << ".\n";
@@ -294,36 +294,38 @@ void displayDeptCapacity(char deptName[])
 
 
 
-double getDeptAvgPerformance(char deptName[])
+
+
+double getDeptAvgPerformance(const char *deptName)
 {
-    int idx = findDepartmentIndexByName(deptName);
-    if (idx == -1)
+    int deptIdx = findDepartmentIndexByName(deptName);
+    if (deptIdx == -1)
     {
         cout << "Department not found.\n";
-        return 0.0;
+        return -1;
     }
-    if (departments_list[idx].emp_count == 0)
+
+    double totalPerformance = 0;
+    int validEmployees = 0;
+
+    for (int i = 0; i < departments_list[deptIdx].emp_count; i++)
     {
-        cout << "No employees in this department.\n";
-        return 0.0;
+        int empId = departments_list[deptIdx].emp_ids[i];
+        int empIdx = findEmployeeIndex(empId);
+
+        if (empIdx != -1) // Validate employee ID
+        {
+            totalPerformance += employees_list[empIdx].performance;
+            validEmployees++;
+        }
     }
 
-    double sum = 0.0;
-    int counted = departments_list[idx].emp_count;
+    if (validEmployees == 0)
+        return -1; // No valid employees found
 
-    // Just sum performance assuming dept.emp_ids[i] matches employee i in employees_list
-    // (or you have direct mapping so no need to check)
-    for (int i = 0; i < counted; i++)
-    {
-        int empId = departments_list[idx].emp_ids[i];
-        // Assuming empId corresponds to employees_list[i] (or you have other guarantee)
-        // If not, you must have a way to get employee performance directly, e.g. employee array indexed by empId
-        // Here we'll just sum performance blindly by index i (if that assumption holds)
-        sum += employees_list[i].performance;  // <-- This may not be correct unless you have a mapping
-    }
-
-    return sum / counted;
+    return totalPerformance / validEmployees;
 }
+
 
 
 

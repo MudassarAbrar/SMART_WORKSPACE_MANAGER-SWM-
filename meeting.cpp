@@ -307,7 +307,11 @@ void loadMeetingsFromText(const char *filename)
     meeting_count = 0;
 
     if (!fin)
+    {
+        cout << "Unable to open meetings file for reading.\n";
         return;
+    }
+        
 
     while (meeting_count < MAX_MEETINGS)
     {
@@ -321,12 +325,12 @@ void loadMeetingsFromText(const char *filename)
         if (slot.participant_count < 0)
             slot.participant_count = 0;
 
-        // slot.participant_capacity = (slot.participant_count > 0)
-        //                             ? slot.participant_count
-        //                             : 10;
+        slot.participant_capacity = (slot.participant_count > 0)
+                                    ? slot.participant_count
+                                    : 10;
 
-        if (slot.participant_ids != nullptr)
-            delete[] slot.participant_ids;
+        // if (slot.participant_ids != nullptr)
+        //     delete[] slot.participant_ids;
 
         slot.participant_ids = new int[slot.participant_capacity];
 
