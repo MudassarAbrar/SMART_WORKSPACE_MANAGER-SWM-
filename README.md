@@ -1,237 +1,302 @@
-----------------------Smart Workspace Manager----------------------
 
-A modular C++ console application designed to manage employees, departments, and meetings within an organization.
-The system demonstrates dynamic memory allocation, structured project architecture, file persistence, and multi-module program design.
+# 🌟 Smart Workspace Manager (SWM)
 
-- Table of Contents
+A modular **C++ console application** designed to manage **employees**, **departments**, and **meetings** within an organization.  
+The system demonstrates **dynamic memory allocation**, **structured architecture**, **file persistence**, and **multi-module program design**.
 
-1. Overview
+---
 
-2. Key Features
+## 📌 Table of Contents
+1. [Overview](#overview)  
+2. [Key Features](#key-features)  
+3. [Project Structure](#project-structure)  
+4. [Data Flow & Architecture](#data-flow--architecture)  
+5. [Build Instructions](#build-instructions)  
+6. [Running the Program](#running-the-program)  
+7. [Data File Formats](#data-file-formats)  
+8. [Module Responsibilities](#module-responsibilities)  
+9. [Team Members & Work Division](#team-members--work-division)
 
-3. Project Structure
+---
 
-4. Data Flow & Architecture
+## 📘 Overview
 
-5. Build Instructions
+**Smart Workspace Manager** is a C++ application built to simulate a real-world office management system.
 
-6. Running the Program
+It efficiently handles:
+- Employee records  
+- Department data  
+- Meeting scheduling  
 
-7. Data File Formats
+The system uses **dynamic memory**, **modular code**, and **simple text file storage** to persist data across program runs.
 
-8. Module Responsibilities
+---
 
-- Overview
+## 🚀 Key Features
 
-Smart Workspace Manager is a C++ application developed to simulate a real-world workplace management system.
-It relies on dynamic memory and modular code architecture to efficiently handle employees, departments, and meetings.
-All system data is persisted to simple text files for reusability across sessions.
+### 👨‍💼 Employee Management
+- Add & remove employees  
+- Update attendance and performance  
+- Determine bonus eligibility  
+- View complete employee details  
+- Automatically link employee to department  
 
-- Key Features
+### 🏢 Department Management
+- Create & delete departments  
+- Store and track employee IDs  
+- Display department details  
+- Identify top performer  
+- Compute average performance  
+- Check department capacity  
 
-> Employee Management
+### 📅 Meeting Management
+- Create meetings with topic, date, and time  
+- Check & prevent scheduling clashes  
+- Add participants using employee IDs  
+- Display meeting & participant details  
 
-Add and remove employees
+---
 
-Update attendance and performance
+## 💾 Data Persistence
 
-Determine bonus eligibility
+All data is automatically saved to:
 
-View complete employee details
-
-Auto-link employee to respective department
-
-> Department Management
-
-Create and delete departments
-
-Store and track employee IDs
-
-Display full department information
-
-Identify top performer
-
-Compute department average performance
-
-Check capacity and utilization
-
-> Meeting Management
-
-Create meetings with topic, date, and time
-
-Ensure no scheduling clashes
-
-Add participants by employee ID
-
-Display meeting details and participant list
-
-- Data Persistence
-
-Data is saved automatically into:
+```
 
 employee.txt
-
 departments.txt
-
 meetings.txt
 
-Data reloads whenever the program starts.
+```
 
-- Project Structure
+Data is reloaded every time the program starts.
+
+---
+
+## 📁 Project Structure
+
+```
 
 .
-├── main.cpp // Menu system and program flow
-├── project.h // Structs, constants, global declarations
-├── global.cpp // Memory allocation + global variable definitions
-├── employee.cpp // Employee management logic
-├── department.cpp // Department operations logic
-├── meeting.cpp // Meeting scheduling and participant handling
+├── main.cpp                // Menu system and program flow
+├── project.h               // Structs, constants, global declarations
+├── global.cpp              // Memory allocation + global variables
+├── employee.cpp            // Employee logic
+├── department.cpp          // Department logic
+├── meeting.cpp             // Meeting management logic
 │
-├── employee.txt // Employee data storage
-├── departments.txt // Department data storage
-├── meetings.txt // Meeting data storage
+├── employee.txt            // Employee data
+├── departments.txt         // Department data
+├── meetings.txt            // Meeting data
 │
-└── README.md // Project documentation
+└── README.md               // Project documentation
 
-- Data Flow & Architecture
+````
 
-1. Global Resources (global.cpp)
+---
 
-Allocates dynamic arrays for employees, departments, meetings
+## 🧠 Data Flow & Architecture
 
-Stores counters:
+### 1. **Global Resources (global.cpp)**
+Handles dynamic memory and global state.
 
-employee_count
+- Allocates arrays for:
+  - Employees  
+  - Departments  
+  - Meetings  
 
-department_count
+- Stores counters:
+  - `employee_count`
+  - `department_count`
+  - `meeting_count`
 
-meeting_count
+- Core functions:
+  - `initializeMemory()`
+  - `freeMemory()`
 
-Implements:
+---
 
-initializeMemory()
+### 2. **Core Modules**
 
-freeMemory()
+| File | Responsibility |
+|------|---------------|
+| **employee.cpp** | Employee CRUD, performance, bonus, department linking, file I/O |
+| **department.cpp** | Department creation, capacity management, metrics, file I/O |
+| **meeting.cpp** | Meetings, clash detection, participants, file persistence |
+| **main.cpp** | Menu-driven interface and navigation |
 
-2. Core Modules
+---
 
-File Responsibility
+### 3. **Struct & Header Definitions (project.h)**
 
-employee.cpp Employee creation, deletion, updates, and file I/O
-department.cpp Department creation, capacity checks, metric calculations
-meeting.cpp Meeting creation, clash detection, participant management
-main.cpp User-facing menu and program navigation
+Contains all shared structures:
+- `Employee`  
+- `Department`  
+- `Meeting`
 
-3. Struct & Header Definitions (project.h)
+Also includes:
+- Global pointers  
+- Function prototypes  
+- Shared constants  
 
-Describes:
+---
 
-Employee, Department, Meeting structures
+## 🛠 Build Instructions
 
-Global pointer declarations
-
-Function prototypes shared across modules
-
-- Build Instructions
-
-> Linux / macOS
-
+### **Linux / macOS**
+```bash
 g++ main.cpp global.cpp employee.cpp department.cpp meeting.cpp -o workspace_manager
+````
 
-> Windows (TDM-GCC / MinGW)
+### **Windows (MinGW / TDM-GCC)**
 
+```bash
 g++ main.cpp global.cpp employee.cpp department.cpp meeting.cpp -o manager.exe
+```
 
-Running the Program
+---
 
-> Linux / macOS
+## ▶ Running the Program
 
+### Linux / macOS
+
+```bash
 ./workspace_manager
+```
 
-Windows
+### Windows
 
+```bash
 manager.exe
+```
 
-Data File Formats
+---
 
-employee.txt
+## 📂 Data File Formats
 
+### **employee.txt**
+
+```
 emp_id emp_name dept_name salary attendance performance bonus_eligible
+```
 
-departments.txt
+### **departments.txt**
 
+```
 dept_name employee_count emp_id_1 emp_id_2 ...
+```
 
-meetings.txt
+### **meetings.txt**
 
+```
 meet_id topic date time participant_count emp_id_1 emp_id_2 ...
+```
 
-- Module Responsibilities
+---
 
-> employee.cpp
+## 🧩 Module Responsibilities
 
-Create and delete employees
+### ➤ employee.cpp
 
-Manage attendance, performance, and bonus
+* Create/delete employees
+* Manage attendance & performance
+* Bonus calculation
+* Link employee to department
+* Load/save employee data
 
-Link employees to departments
+---
 
-Load and save employee data to text file
+### ➤ department.cpp
 
-> department.cpp
+* Create/delete departments
+* Maintain employee lists
+* Resize department capacity dynamically
+* Identify top performer
+* Calculate average performance
+* Load/save department data
 
-Add and remove departments
+---
 
-Maintain employee ID list for each department
+### ➤ meeting.cpp
 
-Resize department capacity dynamically
+* Create meetings
+* Validate schedules
+* Prevent time/date clashes
+* Add participants
+* Load & save meeting data
 
-Identify top performer
+---
 
-Compute average department performance
+### ➤ main.cpp
 
-Load and save department data
+* Menu-driven user interface
+* Handles input routing
+* Controls program execution
 
-> meeting.cpp
+---
 
-Create meetings with schedule validation
+## 👥 Team Members & Work Division
 
-Prevent time/date clashes
+### **Mudassir Abrar Baig**
 
-Add participants
+**Roll No:** BCF23M035
+**Responsibilities:**
 
-Display meeting details
+* Developed **department module** (`department.cpp`)
+* Capacity handling
+* Top performer & average performance logic
+* Department file I/O
 
-Manage meeting data persistence
+---
 
-> main.cpp
+### **Abdul Rahman Bin Abid**
 
-Master flow of the program
+**Roll No:** BCSF24M021
+**Responsibilities:**
 
-Menu-driven interface
+* Built **meeting module** (`meeting.cpp`)
+* Meeting creation & validation
+* Participant handling
+* Clash detection
+* Organized & formatted documentation
 
-Input handling and delegation to modules
+---
 
-- Team Members & Work Division
+### **Zainab Irfan**
 
-Group Members:
+**Roll No:** BCSF24M013
+**Responsibilities:**
 
-Name: Mudassir Abrar Baig
-1- Roll No.: BCF23M035
-Responsibilities :
-Developed the Department Module (department.cpp), capacity handling, top performer, average performance logic, and file I/O for departments.
+* Developed **employee module** (`employee.cpp`)
+* Employee CRUD, bonus logic
+* Department linking
+* Menu design in `main.cpp`
 
-2 - Name: Abdul Rahman Bin Abid
-Roll No.: BCSF24M021
-Responsibilities : Implemented the Meeting Module (meeting.cpp), including meeting creation, validation, participant handling, and clash detection. Responsible for formatting and organizing project documentation.
+---
 
-3- Name: Zainab Irfan
-Roll No.: BCSF24M013
-Responsibilities :
-Built the Employee Module (employee.cpp), including employee CRUD operations, bonus logic, and linking employees to departments. Also designed menu navigation in main.cpp.
+## 🤝 Work Strategy
 
-Work Strategy
-Each member took ownership of one core module.
-All modules were integrated through shared header files and global dynamic memory.
-Team collaborated on error handling, naming conventions, and file storage formats.
-Final testing, debugging, and documentation were completed jointly.
+* Each member owned one major module
+* All modules connected using shared header and global memory
+* Team collaborated on:
+
+  * Error handling
+  * Naming conventions
+  * File format design
+* Final debugging and documentation done together
+
+---
+
+## ⭐ Final Notes
+
+This project demonstrates:
+
+* Modular C++ development
+* Dynamic memory management
+* Data persistence
+* Realistic workplace simulation
+
+Feel free to fork, improve, and extend the system!
+
+```
+```
